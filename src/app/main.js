@@ -4,6 +4,8 @@ import { Jump } from './scripts/movement.js';
 let { canvas, context } = init();
 initKeys();
 
+let timer = 0/60;
+
 const Player_1 = Sprite({
   x: (canvas.width/2) -20,        // starting x,y position of the sprite
   y: 40,
@@ -16,8 +18,9 @@ const Player_1 = Sprite({
 
 let loop = GameLoop({  // create the main game loop
   update: function () { // game logic goes here
+    timer++;
     Player_1.update();
-    Jump(keyPressed('w'), Player_1);
+    Jump(keyPressed('w'), Player_1, timer);
   },
   render: function () { // render the game state
     Player_1.render();
