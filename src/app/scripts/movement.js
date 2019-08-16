@@ -1,10 +1,10 @@
-export const Jump = (jumpPressed, player) => {
+export const Jump = (jumpPressed, player, jumpTimer) => {
 
   if (jumpPressed) {
     if (!player.jumping && player.grounded) {
       player.jumping = true;
       player.grounded = false;
-      player.dy = 1.50 * -player.speed;
+      player.dy = -player.speed;
     }
   }
 }

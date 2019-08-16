@@ -8,6 +8,7 @@ initKeys();
 
 let timer = 0;
 let currentTime = 0;
+let gravity = 0.4;
 
 const Player_1 = Sprite({
   x: (canvas.width / 2) - 20,        // starting x,y position of the sprite
@@ -64,7 +65,7 @@ let loop = GameLoop({  // create the main game loop
     Player_1.update();
     timer++;
     //Another variable that we can change the value of.
-    currentTime = timer;
+    currentTime = timer/60;
 
 
     //Todo: DEFINITELY going to have to clean this and the sprites up.
@@ -73,7 +74,7 @@ let loop = GameLoop({  // create the main game loop
     let Player_Right_Collide = Collide(Player_1, Right_Wall);
     let Platform_Collide = Collide(Player_1, Platform)
     
-    Jump(keyPressed('w'), Player_1);
+    Jump(keyPressed('w'), Player_1, timer);
     Movement({left: keyPressed('a'), right: keyPressed('d')}, Player_1);
 
     if (Player_Left_Collide === "l" || Player_Right_Collide === "r") {
@@ -85,13 +86,11 @@ let loop = GameLoop({  // create the main game loop
       //Set the timer back to 0 if the bottom is touching.
       timer = 0;
     } else if (Player_Ground_Collide === "t") {
-      Player_1.dy = 0;
+      Player_1.dy = -1;
     }
 
-    //If the jump has persisted across 14 frames, make the player go down.
-    if(currentTime >= 14){
-      Player_1.dy = 4;
-    }
+      Player_1.dy += gravity * currentTime;
+    
 
     
   },
