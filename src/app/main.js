@@ -88,11 +88,11 @@ let loop = GameLoop({  // create the main game loop
         Player_1.jumping = false;
         timer = 0;
       } else if (platformCol === "t") {
-        Player_1.dy = -1;
+        Player_1.dy = 0;
       }
     }
-
-    Player_1.dy += gravity;
+    
+    Player_1.dy += gravity * currentTime;
     
   },
   render: function () { // render the game state
