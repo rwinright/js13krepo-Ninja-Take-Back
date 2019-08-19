@@ -8,6 +8,9 @@ initKeys();
 
 let timer = 0;
 let currentTime = 0;
+let gravity = 0.4;
+
+let platforms = [];
 
 const Player_1 = Sprite({
   x: (canvas.width / 2) - 20,        // starting x,y position of the sprite
@@ -54,53 +57,49 @@ const Platform = Sprite({
   color: 'brown'
 })
 
+platforms.push(Ground, Left_Wall, Right_Wall, Platform)
+
+console.log(platforms)
+
 console.log(canvas.height)
 let loop = GameLoop({  // create the main game loop
   update: function () { // game logic goes here
-    Ground.update();
-    Left_Wall.update();
-    Right_Wall.update();
-    Platform.update();
     Player_1.update();
+
+    //Basically just keeps track of loop-time.
     timer++;
-    //Another variable that we can change the value of.
-    currentTime = timer;
+    currentTime = timer/60;
 
-
-    //Todo: DEFINITELY going to have to clean this and the sprites up.
-    let Player_Ground_Collide = Collide(Player_1, Ground);
-    let Player_Left_Collide = Collide(Player_1, Left_Wall);
-    let Player_Right_Collide = Collide(Player_1, Right_Wall);
-    let Platform_Collide = Collide(Player_1, Platform)
+    //Collision collections
     
-    Jump(keyPressed('w'), Player_1);
+    Jump(keyPressed('w'), Player_1, timer);
     Movement({left: keyPressed('a'), right: keyPressed('d')}, Player_1);
 
-    if (Player_Left_Collide === "l" || Player_Right_Collide === "r") {
-      Player_1.dx = 0;
-      Player_1.jumping = false;
-    } else if (Player_Ground_Collide === "b" || Platform_Collide === "b") {
-      Player_1.grounded = true;
-      Player_1.jumping = false;
-      //Set the timer back to 0 if the bottom is touching.
-      timer = 0;
-    } else if (Player_Ground_Collide === "t") {
-      Player_1.dy = 0;
+    //platform collisions
+    for(let i = 0; i < platforms.length; i++){
+      platforms[i].update();
+      // console.log(platform)
+      let platformCol = Collide(Player_1, platforms[i])
+      if (platformCol === "l" || platformCol === "r") {
+        Player_1.dx = 0;
+        Player_1.jumping = false;
+      } else if (platformCol === "b") {
+        Player_1.grounded = true;
+        Player_1.jumping = false;
+        timer = 0;
+      } else if (platformCol === "t") {
+        Player_1.dy = 0;
+      }
     }
-
-    //If the jump has persisted across 14 frames, make the player go down.
-    if(currentTime >= 14){
-      Player_1.dy = 4;
-    }
-
+    
+    Player_1.dy += gravity * currentTime;
     
   },
   render: function () { // render the game state
     Player_1.render();
-    Platform.render();
-    Ground.render();
-    Left_Wall.render();
-    Right_Wall.render();
+    for(let i = 0; i < platforms.length; i++){
+      platforms[i].render();
+    }
   }
 });
 
