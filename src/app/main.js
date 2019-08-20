@@ -56,7 +56,7 @@ const Left_Wall = Sprite({
 })
 
 const Right_Wall = Sprite({
-  x: canvas.width + 100,
+  x: canvas.width-10,
   y: 0,
   height: canvas.height,
   width: 10,
@@ -73,8 +73,7 @@ const Platform = Sprite({
 
 platforms.push(Ground, Left_Wall, Right_Wall, Platform)
 
-console.log(context.fillText)
-
+//Text stuff!
 context.fillStyle = 'black'
 context.font = '10px Courier New'
 
