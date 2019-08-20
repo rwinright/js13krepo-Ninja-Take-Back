@@ -1,10 +1,11 @@
-import { init, GameLoop, Sprite, initKeys, keyPressed } from 'kontra';
+import { init, GameLoop, Sprite, initKeys, keyPressed, initPointer, pointer } from 'kontra';
 import { Jump } from './scripts/movement';
 import { Movement } from './scripts/movement';
 import { Collide } from './scripts/collision';
 
 let { canvas, context } = init();
 initKeys();
+initPointer();
 
 let timer = 0;
 let currentTime = 0;
@@ -55,7 +56,7 @@ const Left_Wall = Sprite({
 })
 
 const Right_Wall = Sprite({
-  x: canvas.width + 100,
+  x: canvas.width-10,
   y: 0,
   height: canvas.height,
   width: 10,
@@ -72,7 +73,9 @@ const Platform = Sprite({
 
 platforms.push(Ground, Left_Wall, Right_Wall, Platform)
 
-console.log(platforms)
+//Text stuff!
+context.fillStyle = 'black'
+context.font = '10px Courier New'
 
 console.log(canvas.height)
 let loop = GameLoop({  // create the main game loop
@@ -152,6 +155,12 @@ let loop = GameLoop({  // create the main game loop
     for (let i = 0; i < platforms.length; i++) {
       platforms[i].render();
     }
+
+
+    // Good ass mouse tool
+    context.fillText(`x: ${Math.floor(pointer.x)}`, pointer.x + 15, pointer.y - 15);
+    context.fillText(`y: ${Math.floor(pointer.y)}`, pointer.x + 15, pointer.y - 5);
+
   }
 });
 
