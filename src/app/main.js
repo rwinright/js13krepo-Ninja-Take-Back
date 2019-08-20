@@ -25,6 +25,19 @@ const Player_1 = Sprite({
   speed: 3
 });
 
+const Player_2 = Sprite({
+  x: (canvas.width) - 200,        // starting x,y position of the sprite
+  y: 40,
+  color: 'blue',
+  width: 20,
+  height: 20,
+  dx: 0,
+  dy: 0,
+  jumping: false,
+  grounded: false,
+  speed: 3
+});
+
 const Ground = Sprite({
   x: 0,
   y: canvas.height - 10,
@@ -42,7 +55,7 @@ const Left_Wall = Sprite({
 })
 
 const Right_Wall = Sprite({
-  x: canvas.width - 10,
+  x: canvas.width + 100,
   y: 0,
   height: canvas.height,
   width: 10,
@@ -50,7 +63,7 @@ const Right_Wall = Sprite({
 })
 
 const Platform = Sprite({
-  x: canvas.width/2,
+  x: canvas.width / 2,
   y: 220,
   height: 5,
   width: 40,
@@ -65,39 +78,78 @@ console.log(canvas.height)
 let loop = GameLoop({  // create the main game loop
   update: function () { // game logic goes here
     Player_1.update();
+    Player_2.update();
 
     //Basically just keeps track of loop-time.
     timer++;
-    currentTime = timer/60;
+    currentTime = timer / 60;
 
     //Collision collections
-    
+
     Jump(keyPressed('w'), Player_1, timer);
-    Movement({left: keyPressed('a'), right: keyPressed('d')}, Player_1);
+    Jump(keyPressed('w'), Player_2, timer);
+    Movement({ left: keyPressed('a'), right: keyPressed('d') }, Player_1);
+    Movement({ left: keyPressed('left'), right: keyPressed('right') }, Player_2)
+
+    let playerCol = Collide(Player_1, Player_2);
+
+    //player collisions
+
+    if (playerCol === "l" || playerCol === "r") {
+      Player_1.dx = 0;
+      Player_2.dx = 0;
+    } else if (playerCol === "b" || playerCol === "t") {
+      Player_1.dy = 0;
+      Player_2.dy = 0;
+    }
 
     //platform collisions
-    for(let i = 0; i < platforms.length; i++){
+    for (let i = 0; i < platforms.length; i++) {
       platforms[i].update();
       // console.log(platform)
-      let platformCol = Collide(Player_1, platforms[i])
-      if (platformCol === "l" || platformCol === "r") {
+      let platformCol1 = Collide(Player_1, platforms[i]);
+      let platformCol2 = Collide(Player_2, platforms[i]);
+      if (platformCol1 === "l" || platformCol1 === "r") {
         Player_1.dx = 0;
         Player_1.jumping = false;
-      } else if (platformCol === "b") {
+        Player_2.dx = 0;
+        Player_2.jumping = false;
+      } else if (platformCol1 === "b") {
         Player_1.grounded = true;
         Player_1.jumping = false;
+        Player_2.grounded = true;
+        Player_2.jumping = false;
         timer = 0;
-      } else if (platformCol === "t") {
+      } else if (platformCol1 === "t") {
         Player_1.dy = 0;
+        Player_2.dy = 0;
+      }
+
+      if (platformCol2 === "l" || platformCol2 === "r") {
+        Player_1.dx = 0;
+        Player_1.jumping = false;
+        Player_2.dx = 0;
+        Player_2.jumping = false;
+      } else if (platformCol2 === "b") {
+        Player_1.grounded = true;
+        Player_1.jumping = false;
+        Player_2.grounded = true;
+        Player_2.jumping = false;
+        timer = 0;
+      } else if (platformCol2 === "t") {
+        Player_1.dy = 0;
+        Player_2.dy = 0;
       }
     }
-    
-    Player_1.dy += gravity * currentTime;
-    
+
+    Player_1.dy = 3;
+    Player_2.dy = 3;
+
   },
   render: function () { // render the game state
     Player_1.render();
-    for(let i = 0; i < platforms.length; i++){
+    Player_2.render();
+    for (let i = 0; i < platforms.length; i++) {
       platforms[i].render();
     }
   }
