@@ -1,3 +1,4 @@
+
 import { init, GameLoop, Sprite, initKeys, keyPressed, initPointer, pointer } from 'kontra';
 import { Jump } from './scripts/movement';
 import { Movement } from './scripts/movement';
@@ -9,7 +10,7 @@ initPointer();
 
 let timer = 0;
 let currentTime = 0;
-let gravity = 0.4;
+let gravity = 0.01;
 
 let platforms = [];
 
@@ -23,7 +24,8 @@ const Player_1 = Sprite({
   dy: 0,
   jumping: false,
   grounded: false,
-  speed: 3
+  speed: 3,
+  max_fall_speed: 10
 });
 
 const Player_2 = Sprite({
@@ -83,6 +85,8 @@ let loop = GameLoop({  // create the main game loop
     Player_1.update();
     Player_2.update();
 
+    applyGravity(Player_1);
+    applyGravity(Player_2);
     //Basically just keeps track of loop-time.
     timer++;
     currentTime = timer / 60;
@@ -105,6 +109,7 @@ let loop = GameLoop({  // create the main game loop
       Player_1.dy = 0;
       Player_2.dy = 0;
     }
+
 
     //platform collisions
     for (let i = 0; i < platforms.length; i++) {
@@ -145,9 +150,6 @@ let loop = GameLoop({  // create the main game loop
       }
     }
 
-    Player_1.dy = 3;
-    Player_2.dy = 3;
-
   },
   render: function () { // render the game state
     Player_1.render();
@@ -163,5 +165,14 @@ let loop = GameLoop({  // create the main game loop
 
   }
 });
+
+function applyGravity(player) {
+  if (player.ddy < player.max_fall_speed && !player.grounded) {
+    player.ddy += gravity;
+  }
+  else {
+    player.ddy = 0;
+  }
+}
 
 loop.start();
