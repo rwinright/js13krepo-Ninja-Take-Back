@@ -14,32 +14,6 @@ let gravity = 0.4;
 
 let platforms = [];
 
-const Player_1 = Sprite({
-  x: (canvas.width / 2) - 20,        // starting x,y position of the sprite
-  y: 40,
-  color: 'red',
-  width: 20,
-  height: 20,
-  dx: 0,
-  dy: 0,
-  jumping: false,
-  grounded: false,
-  speed: 3
-});
-
-const Player_2 = Sprite({
-  x: (canvas.width) - 200,        // starting x,y position of the sprite
-  y: 40,
-  color: 'blue',
-  width: 20,
-  height: 20,
-  dx: 0,
-  dy: 0,
-  jumping: false,
-  grounded: false,
-  speed: 3
-});
-
 const Ground = Sprite({
   x: 0,
   y: canvas.height - 10,
@@ -104,6 +78,31 @@ const Platform = Sprite({
   color: 'brown'
 })
 
+const Player_1 = Sprite({
+  x: (Spawn.width + Left_Wall.width) - 20,        // starting x,y position of the sprite based on spawn
+  y: Spawn.y -40,
+  color: 'red',
+  width: 20,
+  height: 20,
+  dx: 0,
+  dy: 0,
+  jumping: false,
+  grounded: false,
+  speed: 3
+});
+
+const Player_2 = Sprite({
+  x: (Spawn.width + Left_Wall.width) - 40,        // starting x,y position of the sprite based on spawn
+  y: Spawn.y -80,
+  color: 'blue',
+  width: 20,
+  height: 20,
+  dx: 0,
+  dy: 0,
+  jumping: false,
+  grounded: false,
+  speed: 3
+});
 platforms.push(Ground, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Ground_Slow, Platform)
 
 //Text stuff!
