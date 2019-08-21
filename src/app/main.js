@@ -1,5 +1,7 @@
+
+
 import { init, GameLoop, Sprite, initKeys, keyPressed } from 'kontra';
-import { Jump } from './scripts/movement';
+import { Jump, StompJump } from './scripts/movement';
 import { Movement } from './scripts/movement';
 import { Collide } from './scripts/collision';
 
@@ -8,7 +10,7 @@ initKeys();
 
 let timer = 0;
 let currentTime = 0;
-let gravity = 0.4;
+let gravity = 0.01;
 
 let platforms = [];
 
@@ -22,7 +24,8 @@ const Player_1 = Sprite({
   dy: 0,
   jumping: false,
   grounded: false,
-  speed: 3
+  speed: 3,
+  max_fall_speed: 10
 });
 
 const Ground = Sprite({
@@ -50,7 +53,7 @@ const Right_Wall = Sprite({
 })
 
 const Platform = Sprite({
-  x: canvas.width/2,
+  x: canvas.width / 2,
   y: 220,
   height: 5,
   width: 40,
@@ -65,18 +68,19 @@ console.log(canvas.height)
 let loop = GameLoop({  // create the main game loop
   update: function () { // game logic goes here
     Player_1.update();
-
+    applyGravity(Player_1);
     //Basically just keeps track of loop-time.
     timer++;
-    currentTime = timer/60;
+    currentTime = timer / 60;
 
     //Collision collections
-    
+
     Jump(keyPressed('w'), Player_1, timer);
-    Movement({left: keyPressed('a'), right: keyPressed('d')}, Player_1);
+    // StompJump(keyRel)
+    Movement({ left: keyPressed('a'), right: keyPressed('d') }, Player_1);
 
     //platform collisions
-    for(let i = 0; i < platforms.length; i++){
+    for (let i = 0; i < platforms.length; i++) {
       platforms[i].update();
       // console.log(platform)
       let platformCol = Collide(Player_1, platforms[i])
@@ -91,16 +95,25 @@ let loop = GameLoop({  // create the main game loop
         Player_1.dy = 0;
       }
     }
-    
-    Player_1.dy += gravity * currentTime;
-    
+
+
+
   },
   render: function () { // render the game state
     Player_1.render();
-    for(let i = 0; i < platforms.length; i++){
+    for (let i = 0; i < platforms.length; i++) {
       platforms[i].render();
     }
   }
 });
+
+function applyGravity(player) {
+  if (player.ddy < player.max_fall_speed && !player.grounded) {
+    player.ddy += gravity;
+  }
+  else {
+    player.ddy = 0;
+  }
+}
 
 loop.start();
