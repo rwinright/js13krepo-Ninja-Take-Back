@@ -4,21 +4,20 @@ export const Jump = (jumpPressed, player, jumpTimer) => {
     if (!player.jumping && player.grounded) {
       player.jumping = true;
       player.grounded = false;
-      player.dy = -player.speed * 1.2;
+
+      if (player.dy > -10) {
+        player.dy -= player.speed * 1.2;
+      }
       // player.ddy -= .1;
     }
   }
   else if (!jumpPressed && player.jumping) {
     //player.jumping = false;
-    player.dy += .3;
+    //player.dy += .3;
   }
 }
 
-export const StompJump = (released, player) => {
-  if (released) {
 
-  }
-}
 
 export const Movement = (keyPress, player) => {
   if (keyPress.right) {
