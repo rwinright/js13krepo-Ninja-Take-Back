@@ -4,6 +4,7 @@ import { Jump } from './scripts/movement';
 import { Movement } from './scripts/movement';
 import { Collide } from './scripts/collision';
 
+
 let { canvas, context } = init();
 initKeys();
 initPointer();
@@ -65,15 +66,72 @@ const Right_Wall = Sprite({
   color: 'brown'
 })
 
-const Platform = Sprite({
-  x: canvas.width / 2,
-  y: 220,
-  height: 5,
-  width: 40,
+const Top_Wall = Sprite({
+  x: 0,
+  y: 0,
+  height: 10,
+  width: canvas.width,
   color: 'brown'
 })
 
-platforms.push(Ground, Left_Wall, Right_Wall, Platform)
+const Spawn = Sprite({ //Dynamically adjusts to be next to left wall
+  x: Left_Wall.width,
+  y: canvas.height/2,
+  height: 190,
+  width: 50,
+  color: 'black'
+})
+
+const End = Sprite({//Dynamically adjusts to be next to right wall
+  x: Right_Wall.x-50,
+  y: canvas.height/2,
+  height: 190,
+  width: 50,
+  color: 'black'
+})
+
+const Ground_Slow = Sprite({//Dynamically adjusts to be next to Ground and between the start/end
+  x: Spawn.x + Spawn.width,
+  y: canvas.height - 20,
+  width: End.x - (Spawn.x + Spawn.width),
+  height: 10,
+  color: 'Green'
+})
+
+const Platform = Sprite({
+  x: Ground_Slow.width/2,
+  y: (Spawn.y+End.y)/2,
+  height: 5,
+  width: Ground_Slow.width/4,
+  color: 'brown'
+})
+
+const Player_1 = Sprite({
+  x: (Spawn.width + Left_Wall.width) - 20,        // starting x,y position of the sprite based on spawn
+  y: Spawn.y -40,
+  color: 'red',
+  width: 20,
+  height: 20,
+  dx: 0,
+  dy: 0,
+  jumping: false,
+  grounded: false,
+  speed: 3
+});
+
+const Player_2 = Sprite({
+  x: (Spawn.width + Left_Wall.width) - 40,        // starting x,y position of the sprite based on spawn
+  y: Spawn.y -80,
+  color: 'blue',
+  width: 20,
+  height: 20,
+  dx: 0,
+  dy: 0,
+  jumping: false,
+  grounded: false,
+  speed: 3
+});
+platforms.push(Ground, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Ground_Slow, Platform)
 
 //Text stuff!
 context.fillStyle = 'black'
