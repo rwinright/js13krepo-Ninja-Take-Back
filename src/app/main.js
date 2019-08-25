@@ -200,11 +200,7 @@ function applyCollision(player) {
       player.jumping = false;
       player.grounded = true;
       // added a slow property to platforms as I believe we 'may' be using this property more.
-      if (platforms[i].slowPlayer) {
-        player.speed = 1.3
-      } else {
-        player.speed = 3
-      }
+      platforms[i].slowPlayer ? player.speed = 1.3 : player.speed = 3
     }
     else if (platformCol === "t") {
       player.dy = 0;
