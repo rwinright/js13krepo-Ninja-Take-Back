@@ -7,9 +7,12 @@ import p1_ss from './assets/player/P1_Walking.png';
 let p1_spriteSheet = new Image();
 p1_spriteSheet.src = p1_ss;
 
+console.log(document.monetization)
+
 p1_spriteSheet.onload = function () {
 
   let { canvas, context } = init();
+
   initKeys();
   initPointer();
 
@@ -28,7 +31,7 @@ p1_spriteSheet.onload = function () {
     animations: {
       // create a named animation: walk
       walk_right: {
-        frames: [4, 5, 6, 7],  // frames 0 through 9
+        frames: [4, 5, 6, 7],
         frameRate: 10
       },
       walk_left: {
