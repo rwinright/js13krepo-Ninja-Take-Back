@@ -6,7 +6,7 @@ export const Jump = (jumpPressed, player, jumpTimer) => {
       player.grounded = false;
 
       if (player.dy > -10) {
-        player.dy -= player.speed * 1.2;
+        player.dy -= player.speed * 1.5;
       }
       // player.ddy -= .1;
     }
