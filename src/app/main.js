@@ -25,7 +25,8 @@ const Player_1 = Sprite({
   jumping: true,
   grounded: false,
   speed: 3,
-  max_fall_speed: 4
+  max_fall_speed: 4,
+  climbing: false
 });
 
 const Player_2 = Sprite({
@@ -39,7 +40,8 @@ const Player_2 = Sprite({
   jumping: true,
   grounded: false,
   speed: 3,
-  max_fall_speed: 4
+  max_fall_speed: 4,
+  climbing: false
 });
 
 const Ground = Sprite({
@@ -55,7 +57,8 @@ const Left_Wall = Sprite({
   y: 0,
   height: canvas.height,
   width: 10,
-  color: 'brown'
+  color: 'brown',
+  name: "wallL"
 })
 
 const Right_Wall = Sprite({
@@ -63,7 +66,8 @@ const Right_Wall = Sprite({
   y: 0,
   height: canvas.height,
   width: 10,
-  color: 'brown'
+  color: 'brown',
+  name: "wallR"
 })
 
 const Top_Wall = Sprite({
@@ -189,6 +193,9 @@ function applyCollision(player) {
     let platformCol = Collide(player, platforms[i]);
 
     if (platformCol === "l" || platformCol === "r") {
+      //if (platforms[i].name === "wallR" || platformCol[i].name === "wallL") {
+      player.climbing = true;
+      //}
       player.dx = 0;
     }
     else if (platformCol === "b") {
@@ -196,9 +203,12 @@ function applyCollision(player) {
       player.ddy = 0;
       player.jumping = false;
       player.grounded = true;
+      player.climbing = false;
+      player.speed = 3;
     }
     else if (platformCol === "t") {
       player.dy = 0;
+      player.climbing = false;
     }
 
     let slowCol = Collide(player, Ground_Slow);

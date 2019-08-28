@@ -1,7 +1,11 @@
 export const Jump = (jumpPressed, player, jumpTimer) => {
 
   if (jumpPressed) {
-    if (!player.jumping && player.grounded) {
+    if (player.climbing) {
+      player.dy = -4;
+
+    }
+    else if (!player.jumping && player.grounded) {
       player.jumping = true;
       player.grounded = false;
 
@@ -22,10 +26,10 @@ export const Jump = (jumpPressed, player, jumpTimer) => {
 export const Movement = (keyPress, player) => {
   if (keyPress.right) {
     // right arrow
-    player.dx = 3;
+    player.dx = player.speed;
   } else if (keyPress.left) {
     // left arrow
-    player.dx = -3;
+    player.dx = -player.speed;
   } else {
     player.dx = 0;
   }
