@@ -1,16 +1,12 @@
 export const Jump = (jumpPressed, player, jumpTimer) => {
 
   if (jumpPressed) {
-    if (player.climbing) {
-      player.dy = -4;
-
-    }
-    else if (!player.jumping && player.grounded) {
+    if (!player.jumping && player.grounded) {
       player.jumping = true;
       player.grounded = false;
 
-      if (player.dy > -10) {
-        player.dy -= player.speed * 1.5;
+      if (player.dy > -9) {
+        player.dy -= 4.5;
       }
       // player.ddy -= .1;
     }

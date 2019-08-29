@@ -83,7 +83,9 @@ const Spawn = Sprite({ //Dynamically adjusts to be next to left wall
   y: canvas.height / 2,
   height: 190,
   width: 50,
-  color: 'black'
+  color: 'black',
+  isClimbable: true
+
 })
 
 const End = Sprite({//Dynamically adjusts to be next to right wall
@@ -91,7 +93,8 @@ const End = Sprite({//Dynamically adjusts to be next to right wall
   y: canvas.height / 2,
   height: 190,
   width: 50,
-  color: 'black'
+  color: 'black',
+  isClimbable: false
 })
 
 const Ground_Slow = Sprite({//Dynamically adjusts to be next to Ground and between the start/end
@@ -161,42 +164,32 @@ let loop = GameLoop({  // create the main game loop
     for (let i = 0; i < platforms.length; i++) {
       platforms[i].render();
     }
-
-
     // Good ass mouse tool
     context.fillText(`x: ${Math.floor(pointer.x)}`, pointer.x + 15, pointer.y - 15);
     context.fillText(`y: ${Math.floor(pointer.y)}`, pointer.x + 15, pointer.y - 5);
-
   }
 });
 
 function applyGravity(player) {
-  // if (player.grounded && !player.jumping) {
-  //   player.dy = 0;
-  // }
-
-  // else {
-  if (player.ddy < player.max_fall_speed) {
+  if (player.ddy < player.max_fall_speed && !player.climbing) {
     player.ddy += gravity;
   }
-  //   //player.dy += .1;
-  // }
-
-
 }
 
 function applyCollision(player) {
+
   for (let i = 0; i < platforms.length; i++) {
+    let plat = platforms[i];
     platforms[i].update();
     // console.log(platform)
 
     let platformCol = Collide(player, platforms[i]);
 
     if (platformCol === "l" || platformCol === "r") {
-      //if (platforms[i].name === "wallR" || platformCol[i].name === "wallL") {
-      player.climbing = true;
-      //}
       player.dx = 0;
+      if (plat.isClimbable) {
+        player.dy = -10;
+      }
     }
     else if (platformCol === "b") {
       player.dy = 0;
@@ -210,14 +203,26 @@ function applyCollision(player) {
       player.dy = 0;
       player.climbing = false;
     }
-
     let slowCol = Collide(player, Ground_Slow);
 
     if (slowCol === "b") {
       player.speed = 1.5;
     }
 
+    if (IsCollisionFree(player)) {
+      player.climbing = false;
+    }
   }
+}
+
+function IsCollisionFree(player) {
+  for (let i = 0; i < platforms.length; i++) {
+    if (player.collidesWith(platforms[i])) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 loop.start();
