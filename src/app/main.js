@@ -13,6 +13,7 @@ let currentTime = 0;
 let gravity = 0.02;
 
 let platforms = [];
+let gui = [];
 
 const Player_1 = Sprite({
   x: (canvas.width / 2) - 20,        // starting x,y position of the sprite
@@ -113,18 +114,59 @@ const Platform = Sprite({
   color: 'brown'
 })
 
+const ItemBoxBottom = Sprite({
+  x: 0,
+  y: 50,
+  height: 10,
+  width: canvas.width,
+  color: 'black'
+})
 
-platforms.push(Ground, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Ground_Slow, Platform)
+const ItemBoxTop = Sprite({
+  x: 0,
+  y: 0,
+  width: canvas.width,
+  height: 10,
+  color: 'black'
+})
 
+const ItemBoxLeft = Sprite({
+  x: 0,
+  y: 0,
+  height: 50,
+  width: 15,
+  color: 'black'
+})
+
+const ItemBoxRight = Sprite({
+  height: 50,
+  width: 15,
+  x: canvas.width - 15,
+  y: 0,
+  color: 'black'
+})
+
+const Divider = Sprite({
+  height: 50,
+  width: 20,
+  x: canvas.width / 2,
+  y: 0,
+  color: 'black'
+})
+
+platforms.push(Ground, Ground_Slow, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform)
+
+gui.push(ItemBoxBottom, ItemBoxTop, ItemBoxLeft, ItemBoxRight, Divider);
 //Text stuff!
 context.fillStyle = 'teal'
 context.font = '10px Courier New'
-
-console.log(canvas.height)
 let loop = GameLoop({  // create the main game loop
   update: function () { // game logic goes here
     Player_1.update();
     Player_2.update();
+    for (let i = 0; i < gui.length; i++) {
+      gui[i].update();
+    }
 
 
     //Basically just keeps track of loop-time.
@@ -164,6 +206,9 @@ let loop = GameLoop({  // create the main game loop
     for (let i = 0; i < platforms.length; i++) {
       platforms[i].render();
     }
+    for (let j = 0; j < gui.length; j++) {
+      gui[j].render();
+    }
     // Good ass mouse tool
     context.fillText(`x: ${Math.floor(pointer.x)}`, pointer.x + 15, pointer.y - 15);
     context.fillText(`y: ${Math.floor(pointer.y)}`, pointer.x + 15, pointer.y - 5);
@@ -181,7 +226,6 @@ function applyCollision(player) {
   for (let i = 0; i < platforms.length; i++) {
     let plat = platforms[i];
     platforms[i].update();
-    // console.log(platform)
 
     let platformCol = Collide(player, platforms[i]);
 
@@ -208,10 +252,11 @@ function applyCollision(player) {
     if (slowCol === "b") {
       player.speed = 1.5;
     }
-
-    if (IsCollisionFree(player)) {
-      player.climbing = false;
+    if (player.x > canvas.width || player.y > canvas.height || player.x < 0 || player.y < 0) {
+      player.x = 30;
+      player.y = 170;
     }
+
   }
 }
 
