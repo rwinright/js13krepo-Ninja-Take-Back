@@ -1,4 +1,4 @@
-import { init, GameLoop, Sprite, SpriteSheet, initKeys, keyPressed, initPointer, pointer } from 'kontra';
+import { init, GameLoop, Sprite, SpriteSheet, initKeys, keyPressed, initPointer, pointer  } from 'kontra';
 import { Jump } from './scripts/movement';
 import { Movement } from './scripts/movement';
 import { Collide } from './scripts/collision';
@@ -6,8 +6,6 @@ import p1_ss from './assets/player/P1_Walking.png';
 
 let p1_spriteSheet = new Image();
 p1_spriteSheet.src = p1_ss;
-
-console.log(document.monetization)
 
 p1_spriteSheet.onload = function () {
 
@@ -84,7 +82,8 @@ p1_spriteSheet.onload = function () {
     width: canvas.width,
     height: 10,
     color: 'brown',
-    slowPlayer: false
+    slowPlayer: false,
+    hurtPlayer: false
   })
 
   const Left_Wall = Sprite({
@@ -93,7 +92,8 @@ p1_spriteSheet.onload = function () {
     height: canvas.height,
     width: 10,
     color: 'brown',
-    slowPlayer: false
+    slowPlayer: false,
+    hurtPlayer: false
   })
 
   const Right_Wall = Sprite({
@@ -102,7 +102,8 @@ p1_spriteSheet.onload = function () {
     height: canvas.height,
     width: 10,
     color: 'brown',
-    slowPlayer: false
+    slowPlayer: false,
+    hurtPlayer: false
   })
 
   const Top_Wall = Sprite({
@@ -111,7 +112,8 @@ p1_spriteSheet.onload = function () {
     height: 10,
     width: canvas.width,
     color: 'brown',
-    slowPlayer: false
+    slowPlayer: false,
+    hurtPlayer: false
   })
 
   const Spawn = Sprite({ //Dynamically adjusts to be next to left wall
@@ -120,7 +122,8 @@ p1_spriteSheet.onload = function () {
     height: 190,
     width: 50,
     color: 'black',
-    slowPlayer: false
+    slowPlayer: false,
+    hurtPlayer: false
   })
 
   const End = Sprite({//Dynamically adjusts to be next to right wall
@@ -129,7 +132,8 @@ p1_spriteSheet.onload = function () {
     height: 190,
     width: 50,
     color: 'black',
-    slowPlayer: false
+    slowPlayer: false,
+    hurtPlayer: false
   })
 
   const Ground_Slow = Sprite({ //Dynamically adjusts to be next to Ground and between the start/end
@@ -138,7 +142,8 @@ p1_spriteSheet.onload = function () {
     width: End.x - (Spawn.x + Spawn.width),
     height: 10,
     color: 'Green',
-    slowPlayer: true
+    slowPlayer: true,
+    hurtPlayer: true
   })
 
   const Platform = Sprite({
@@ -165,7 +170,9 @@ p1_spriteSheet.onload = function () {
     jumping: true,
     grounded: false,
     speed: 3,
-    max_fall_speed: 10
+    max_fall_speed: 10,
+    isDead: false,
+    currentHealth: 15
   });
 
   const Player_2 = Sprite({
@@ -181,7 +188,9 @@ p1_spriteSheet.onload = function () {
     jumping: true,
     grounded: false,
     speed: 3,
-    max_fall_speed: 10
+    max_fall_speed: 10,
+    isDead: false,
+    currentHealth: 15
   });
 
   platforms.push(Ground, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform, Ground_Slow);
@@ -229,8 +238,14 @@ p1_spriteSheet.onload = function () {
     },
 
     render: function () { // render the game state
-      Player_1.render();
-      Player_2.render();
+      if(!Player_1.isDead){
+        Player_1.render();
+      }
+      
+      if(!Player_2.isDead){
+        Player_2.render();
+      }
+
       for (let i = 0; i < platforms.length; i++) {
         platforms[i].render();
       }
@@ -268,6 +283,15 @@ p1_spriteSheet.onload = function () {
         player.jumping = false;
         player.grounded = true;
         // added a slow property to platforms as I believe we 'may' be using this property more.
+        if(platforms[i].hurtPlayer){
+          player.currentHealth -= 5;
+          if(player.currentHealth <= 0){
+            player.isDead = true;
+            //Get the dude outta here.
+            player.x = 0;
+            player.y = 0;
+          }
+        }
         platforms[i].slowPlayer ? player.speed = 1.3 : player.speed = 3
       }
       else if (platformCol === "t") {
