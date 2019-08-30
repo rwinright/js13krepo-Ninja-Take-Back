@@ -208,8 +208,8 @@ p1_spriteSheet.onload = function () {
       applyCollision(Player_1);
       applyCollision(Player_2);
 
-      Player_1.update();
-      Player_2.update();
+      !Player_1.isDead ? Player_1.update() : null;
+      !Player_2.isDead ? Player_2.update() : null;
 
       //Basically just keeps track of loop-time.
       timer++;
