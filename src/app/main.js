@@ -1,13 +1,13 @@
-import { init, GameLoop, Sprite, SpriteSheet, initKeys, keyPressed, initPointer, pointer  } from 'kontra';
+import { init, GameLoop, Sprite, track, SpriteSheet, initKeys, keyPressed, initPointer, pointer, onPointerUp, onPointerDown, pointerPressed, pointerOver  } from 'kontra';
 import { Jump } from './scripts/movement';
 import { Movement } from './scripts/movement';
 import { Collide } from './scripts/collision';
 import p1_ss from './assets/player/P1_Walking.png';
 
-let p1_spriteSheet = new Image();
-p1_spriteSheet.src = p1_ss;
+let player_sprite = new Image();
+player_sprite.src = p1_ss;
 
-p1_spriteSheet.onload = function () {
+player_sprite.onload = function () {
 
   let { canvas, context } = init();
 
@@ -23,7 +23,7 @@ p1_spriteSheet.onload = function () {
   //P1 Spritesheet function
 
   let P1_SpriteSheet = SpriteSheet({
-    image: p1_spriteSheet,
+    image: player_sprite,
     frameWidth: 72,
     frameHeight: 72,
     animations: {
@@ -50,7 +50,7 @@ p1_spriteSheet.onload = function () {
     //P1 Spritesheet function
 
     let P2_SpriteSheet = SpriteSheet({
-      image: p1_spriteSheet,
+      image: player_sprite,
       frameWidth: 72,
       frameHeight: 72,
       animations: {
@@ -156,6 +156,17 @@ p1_spriteSheet.onload = function () {
     slowPlayer: false
   })
 
+  const Reset_Button = Sprite({
+    x: 710,
+    y: 20,
+    height: 30,
+    width: 70, //Interesting use of the ground slow.
+    color: 'green',
+    resetGame: ()=>{
+      location.reload();
+    }
+  })
+
   const Player_1 = Sprite({
     x: (Spawn.width + Left_Wall.width) - 20, // starting x,y position of the sprite based on spawn
     y: Spawn.y - 40,
@@ -196,7 +207,7 @@ p1_spriteSheet.onload = function () {
   platforms.push(Ground, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform, Ground_Slow);
 
   //Text stuff!
-  context.fillStyle = 'black'
+  context.fillStyle = 'red'
   context.font = '10px Courier New'
 
   let loop = GameLoop({  // create the main game loop
@@ -211,11 +222,22 @@ p1_spriteSheet.onload = function () {
       !Player_1.isDead ? Player_1.update() : null;
       !Player_2.isDead ? Player_2.update() : null;
 
+
+      Reset_Button.update();
+      //Track pointer events on reset button
+      track(Reset_Button);
+      //You can guess what this does.
+      if(pointerOver(Reset_Button) && pointerPressed("left")){
+        onPointerUp(()=>{
+          Reset_Button.color = "red"
+          Reset_Button.resetGame();
+        })
+      }
+      
+
       //Basically just keeps track of loop-time.
       timer++;
       currentTime = timer / 60;
-
-      //Collision collections
 
       Jump(keyPressed('w'), Player_1, timer);
       Jump(keyPressed('up'), Player_2, timer);
@@ -250,10 +272,13 @@ p1_spriteSheet.onload = function () {
         platforms[i].render();
       }
 
+      Reset_Button.render();
 
       // Good-ass mouse tool
       context.fillText(`x: ${Math.floor(pointer.x)}`, pointer.x + 15, pointer.y - 15);
       context.fillText(`y: ${Math.floor(pointer.y)}`, pointer.x + 15, pointer.y - 5);
+
+      context.fillText("RESET", Reset_Button.x + (Reset_Button.width / 2) - 12, Reset_Button.y + (Reset_Button.height / 2) + 2.5);
 
     }
   });
