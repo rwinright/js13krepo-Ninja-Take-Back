@@ -1,20 +1,20 @@
-import { init, GameLoop, Sprite, SpriteSheet, initKeys, keyPressed, initPointer, pointer } from 'kontra';
+import { init, GameLoop, Sprite, track, SpriteSheet, initKeys, keyPressed, initPointer, pointer, onPointerUp, onPointerDown, pointerPressed, pointerOver  } from 'kontra';
 import { Jump } from './scripts/movement';
 import { Movement } from './scripts/movement';
 import { Collide } from './scripts/collision';
 import p1_ss from './assets/player/P1_Walking.png';
 
-let p1_spriteSheet = new Image();
-p1_spriteSheet.src = p1_ss;
+let player_sprite = new Image();
+player_sprite.src = p1_ss;
 
-p1_spriteSheet.onload = function () {
+player_sprite.onload = function () {
 
   let { canvas, context } = init();
+
   initKeys();
   initPointer();
 
   let timer = 0;
-  let currentTime = 0;
   let gravity = .09;
 
   let platforms = [];
@@ -22,13 +22,13 @@ p1_spriteSheet.onload = function () {
   //P1 Spritesheet function
 
   let P1_SpriteSheet = SpriteSheet({
-    image: p1_spriteSheet,
+    image: player_sprite,
     frameWidth: 72,
     frameHeight: 72,
     animations: {
       // create a named animation: walk
       walk_right: {
-        frames: [4, 5, 6, 7],  // frames 0 through 9
+        frames: [4, 5, 6, 7],
         frameRate: 10
       },
       walk_left: {
@@ -49,7 +49,7 @@ p1_spriteSheet.onload = function () {
     //P1 Spritesheet function
 
     let P2_SpriteSheet = SpriteSheet({
-      image: p1_spriteSheet,
+      image: player_sprite,
       frameWidth: 72,
       frameHeight: 72,
       animations: {
@@ -81,7 +81,8 @@ p1_spriteSheet.onload = function () {
     width: canvas.width,
     height: 10,
     color: 'brown',
-    slowPlayer: false
+    slowPlayer: false,
+    hurtPlayer: false
   })
 
   const Left_Wall = Sprite({
@@ -90,7 +91,8 @@ p1_spriteSheet.onload = function () {
     height: canvas.height,
     width: 10,
     color: 'brown',
-    slowPlayer: false
+    slowPlayer: false,
+    hurtPlayer: false
   })
 
   const Right_Wall = Sprite({
@@ -99,7 +101,8 @@ p1_spriteSheet.onload = function () {
     height: canvas.height,
     width: 10,
     color: 'brown',
-    slowPlayer: false
+    slowPlayer: false,
+    hurtPlayer: false
   })
 
   const Top_Wall = Sprite({
@@ -108,7 +111,8 @@ p1_spriteSheet.onload = function () {
     height: 10,
     width: canvas.width,
     color: 'brown',
-    slowPlayer: false
+    slowPlayer: false,
+    hurtPlayer: false
   })
 
   const Spawn = Sprite({ //Dynamically adjusts to be next to left wall
@@ -117,7 +121,8 @@ p1_spriteSheet.onload = function () {
     height: 190,
     width: 50,
     color: 'black',
-    slowPlayer: false
+    slowPlayer: false,
+    hurtPlayer: false
   })
 
   const End = Sprite({//Dynamically adjusts to be next to right wall
@@ -126,7 +131,8 @@ p1_spriteSheet.onload = function () {
     height: 190,
     width: 50,
     color: 'black',
-    slowPlayer: false
+    slowPlayer: false,
+    hurtPlayer: false
   })
 
   const Ground_Slow = Sprite({ //Dynamically adjusts to be next to Ground and between the start/end
@@ -135,7 +141,8 @@ p1_spriteSheet.onload = function () {
     width: End.x - (Spawn.x + Spawn.width),
     height: 10,
     color: 'Green',
-    slowPlayer: true
+    slowPlayer: true,
+    hurtPlayer: true
   })
 
   const Platform = Sprite({
@@ -148,12 +155,21 @@ p1_spriteSheet.onload = function () {
     slowPlayer: false
   })
 
+  const Reset_Button = Sprite({
+    x: 710,
+    y: 20,
+    height: 30,
+    width: 70, //Interesting use of the ground slow.
+    color: 'green',
+    resetGame: ()=>{
+      location.reload();
+    }
+  })
+
   const Player_1 = Sprite({
     x: (Spawn.width + Left_Wall.width) - 20, // starting x,y position of the sprite based on spawn
     y: Spawn.y - 40,
     animations: P1_SpriteSheet.animations,
-    // color: 'red',
-    // anchor: {x: 0.5, y: 0.5},
     width: 20,
     height: 20,
     facing: 'right', // Check player facing
@@ -183,10 +199,6 @@ p1_spriteSheet.onload = function () {
 
   platforms.push(Ground, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform, Ground_Slow);
 
-  //Text stuff!
-  context.fillStyle = 'black'
-  context.font = '10px Courier New'
-
   let loop = GameLoop({  // create the main game loop
     update: function () { // game logic goes here
 
@@ -196,14 +208,23 @@ p1_spriteSheet.onload = function () {
       applyCollision(Player_1);
       applyCollision(Player_2);
 
-      Player_1.update();
-      Player_2.update();
+      Player_1.update()
+      Player_2.update()
+
+      Reset_Button.update();
+      //Track pointer events on reset button
+      track(Reset_Button);
+      //You can guess what this does.
+      if(pointerOver(Reset_Button) && pointerPressed("left")){
+        onPointerUp(()=>{
+          Reset_Button.color = "red"
+          Reset_Button.resetGame();
+        })
+      }
+      
 
       //Basically just keeps track of loop-time.
       timer++;
-      currentTime = timer / 60;
-
-      //Collision collections
 
       Jump(keyPressed('w'), Player_1, timer);
       Jump(keyPressed('up'), Player_2, timer);
@@ -211,31 +232,40 @@ p1_spriteSheet.onload = function () {
       Movement({ left: keyPressed('a'), right: keyPressed('d') }, Player_1);
       Movement({ left: keyPressed('left'), right: keyPressed('right') }, Player_2);
 
-      const playerCol = Collide(Player_1, Player_2);
-
-      //player collisions
-
-      if (playerCol === "l" || playerCol === "r") {
-        Player_1.dx = 0;
-        Player_2.dx = 0;
-      } else if (playerCol === "b" || playerCol === "t") {
-        Player_1.dy = -1;
-        Player_2.dy = -1;
+      if(Player_1.collidesWith(Player_2)){
+        Player_1.x = Player_1.x + 1;
       }
+
+      if(Player_2.collidesWith(Player_1)){
+        Player_2.x = Player_2.x - 1;
+      }
+
 
     },
 
     render: function () { // render the game state
+
       Player_1.render();
       Player_2.render();
+
       for (let i = 0; i < platforms.length; i++) {
         platforms[i].render();
       }
 
+      Reset_Button.render();
 
       // Good-ass mouse tool
+
+      //Text stuff!
+      context.fillStyle = 'red'
+      context.font = '12px Courier New'
       context.fillText(`x: ${Math.floor(pointer.x)}`, pointer.x + 15, pointer.y - 15);
       context.fillText(`y: ${Math.floor(pointer.y)}`, pointer.x + 15, pointer.y - 5);
+
+      //Text stuff!
+      context.fillStyle = 'white'
+      context.font = '10px Courier New'
+      context.fillText("RESET", Reset_Button.x + (Reset_Button.width / 2) - 12, Reset_Button.y + (Reset_Button.height / 2) + 2.5);
 
     }
   });
@@ -264,7 +294,6 @@ p1_spriteSheet.onload = function () {
         player.dy = 0;
         player.jumping = false;
         player.grounded = true;
-        // added a slow property to platforms as I believe we 'may' be using this property more.
         platforms[i].slowPlayer ? player.speed = 1.3 : player.speed = 3
       }
       else if (platformCol === "t") {
