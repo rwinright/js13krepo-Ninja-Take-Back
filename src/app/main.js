@@ -14,6 +14,7 @@ let gravity = 0.02;
 
 let platforms = [];
 let gui = [];
+let objects = [];
 
 const Player_1 = Sprite({
   x: (canvas.width / 2) - 20,        // starting x,y position of the sprite
@@ -26,6 +27,7 @@ const Player_1 = Sprite({
   jumping: true,
   grounded: false,
   speed: 3,
+  speed_base: 3,
   max_fall_speed: 4,
   climbing: false
 });
@@ -41,6 +43,7 @@ const Player_2 = Sprite({
   jumping: true,
   grounded: false,
   speed: 3,
+  speed_base: 3,
   max_fall_speed: 4,
   climbing: false
 });
@@ -154,9 +157,35 @@ const Divider = Sprite({
   color: 'black'
 })
 
+const rocket = Sprite({
+  x: 140,
+  y: 200,
+  height: 10,
+  width: 100
+})
+
+const portal = Sprite({
+  x: 200,
+  y: 200,
+  height: 20,
+  width: 10,
+  color: 'purple'
+})
+
+const coffee = Sprite({
+  x: 490,
+  y: 170,
+  width: 10,
+  height: 15,
+  color: 'brown'
+})
+
 platforms.push(Ground, Ground_Slow, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform)
 
 gui.push(ItemBoxBottom, ItemBoxTop, ItemBoxLeft, ItemBoxRight, Divider);
+
+objects.push(rocket, portal, coffee)
+
 //Text stuff!
 context.fillStyle = 'teal'
 context.font = '10px Courier New'
@@ -209,6 +238,9 @@ let loop = GameLoop({  // create the main game loop
     for (let j = 0; j < gui.length; j++) {
       gui[j].render();
     }
+    for (let i = 0; i < objects.length; i++) {
+      objects[i].render();
+    }
     // Good ass mouse tool
     context.fillText(`x: ${Math.floor(pointer.x)}`, pointer.x + 15, pointer.y - 15);
     context.fillText(`y: ${Math.floor(pointer.y)}`, pointer.x + 15, pointer.y - 5);
@@ -216,7 +248,7 @@ let loop = GameLoop({  // create the main game loop
 });
 
 function applyGravity(player) {
-  if (player.ddy < player.max_fall_speed && !player.climbing) {
+  if (player.ddy < player.max_fall_speed && !player.climbing && player.dy < 10) {
     player.ddy += gravity;
   }
 }
@@ -241,7 +273,7 @@ function applyCollision(player) {
       player.jumping = false;
       player.grounded = true;
       player.climbing = false;
-      player.speed = 3;
+      player.speed = player.speed_base;
     }
     else if (platformCol === "t") {
       player.dy = 0;
@@ -250,24 +282,41 @@ function applyCollision(player) {
     let slowCol = Collide(player, Ground_Slow);
 
     if (slowCol === "b") {
-      player.speed = 1.5;
+      player.speed = player.speed_base / 2;
     }
+
+
+
+    //respawn if out of bounds
     if (player.x > canvas.width || player.y > canvas.height || player.x < 0 || player.y < 0) {
       player.x = 30;
       player.y = 170;
+      player.dx = 0;
+      player.ddy = 0;
     }
 
   }
-}
-
-function IsCollisionFree(player) {
-  for (let i = 0; i < platforms.length; i++) {
-    if (player.collidesWith(platforms[i])) {
-      return false;
-    }
+  if (player.collidesWith(rocket)) {
+    player.ddy = 0;
+    player.dy = -9;
   }
 
-  return true;
+  if (player.collidesWith(portal)) {
+    player.x = 30;
+    player.y = 185;
+  }
+
+  if (player.collidesWith(coffee)) {
+    // objects = _.remove(objects, function (n) {
+    //   return n !== coffee;
+    // })
+    objects = objects.filter(function (c) {
+      return c != coffee;
+    })
+
+    player.speed_base = 5;
+
+  }
 }
 
 loop.start();

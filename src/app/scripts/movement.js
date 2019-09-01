@@ -5,10 +5,9 @@ export const Jump = (jumpPressed, player, jumpTimer) => {
       player.jumping = true;
       player.grounded = false;
 
-      if (player.dy > -9) {
-        player.dy -= 4.5;
+      if (player.dy > -20) {
+        player.dy -= 5;
       }
-      // player.ddy -= .1;
     }
   }
   else if (!jumpPressed && player.jumping) {
