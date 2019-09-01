@@ -15,7 +15,6 @@ player_sprite.onload = function () {
   initPointer();
 
   let timer = 0;
-  let currentTime = 0;
   let gravity = .09;
 
   let platforms = [];
@@ -171,8 +170,6 @@ player_sprite.onload = function () {
     x: (Spawn.width + Left_Wall.width) - 20, // starting x,y position of the sprite based on spawn
     y: Spawn.y - 40,
     animations: P1_SpriteSheet.animations,
-    // color: 'red',
-    // anchor: {x: 0.5, y: 0.5},
     width: 20,
     height: 20,
     facing: 'right', // Check player facing
@@ -181,9 +178,7 @@ player_sprite.onload = function () {
     jumping: true,
     grounded: false,
     speed: 3,
-    max_fall_speed: 10,
-    isDead: false,
-    currentHealth: 15
+    max_fall_speed: 10
   });
 
   const Player_2 = Sprite({
@@ -199,16 +194,10 @@ player_sprite.onload = function () {
     jumping: true,
     grounded: false,
     speed: 3,
-    max_fall_speed: 10,
-    isDead: false,
-    currentHealth: 15
+    max_fall_speed: 10
   });
 
   platforms.push(Ground, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform, Ground_Slow);
-
-  //Text stuff!
-  context.fillStyle = 'red'
-  context.font = '10px Courier New'
 
   let loop = GameLoop({  // create the main game loop
     update: function () { // game logic goes here
@@ -219,9 +208,8 @@ player_sprite.onload = function () {
       applyCollision(Player_1);
       applyCollision(Player_2);
 
-      !Player_1.isDead ? Player_1.update() : null;
-      !Player_2.isDead ? Player_2.update() : null;
-
+      Player_1.update()
+      Player_2.update()
 
       Reset_Button.update();
       //Track pointer events on reset button
@@ -237,7 +225,6 @@ player_sprite.onload = function () {
 
       //Basically just keeps track of loop-time.
       timer++;
-      currentTime = timer / 60;
 
       Jump(keyPressed('w'), Player_1, timer);
       Jump(keyPressed('up'), Player_2, timer);
@@ -245,28 +232,21 @@ player_sprite.onload = function () {
       Movement({ left: keyPressed('a'), right: keyPressed('d') }, Player_1);
       Movement({ left: keyPressed('left'), right: keyPressed('right') }, Player_2);
 
-      const playerCol = Collide(Player_1, Player_2);
-
-      //player collisions
-
-      if (playerCol === "l" || playerCol === "r") {
-        Player_1.dx = 0;
-        Player_2.dx = 0;
-      } else if (playerCol === "b" || playerCol === "t") {
-        Player_1.dy = -1;
-        Player_2.dy = -1;
+      if(Player_1.collidesWith(Player_2)){
+        Player_1.x = Player_1.x + 1;
       }
+
+      if(Player_2.collidesWith(Player_1)){
+        Player_2.x = Player_2.x - 1;
+      }
+
 
     },
 
     render: function () { // render the game state
-      if(!Player_1.isDead){
-        Player_1.render();
-      }
-      
-      if(!Player_2.isDead){
-        Player_2.render();
-      }
+
+      Player_1.render();
+      Player_2.render();
 
       for (let i = 0; i < platforms.length; i++) {
         platforms[i].render();
@@ -275,9 +255,16 @@ player_sprite.onload = function () {
       Reset_Button.render();
 
       // Good-ass mouse tool
+
+      //Text stuff!
+      context.fillStyle = 'red'
+      context.font = '12px Courier New'
       context.fillText(`x: ${Math.floor(pointer.x)}`, pointer.x + 15, pointer.y - 15);
       context.fillText(`y: ${Math.floor(pointer.y)}`, pointer.x + 15, pointer.y - 5);
 
+      //Text stuff!
+      context.fillStyle = 'white'
+      context.font = '10px Courier New'
       context.fillText("RESET", Reset_Button.x + (Reset_Button.width / 2) - 12, Reset_Button.y + (Reset_Button.height / 2) + 2.5);
 
     }
@@ -307,16 +294,6 @@ player_sprite.onload = function () {
         player.dy = 0;
         player.jumping = false;
         player.grounded = true;
-        // added a slow property to platforms as I believe we 'may' be using this property more.
-        if(platforms[i].hurtPlayer){
-          player.currentHealth -= 5;
-          if(player.currentHealth <= 0){
-            player.isDead = true;
-            //Get the dude outta here.
-            player.x = 0;
-            player.y = 0;
-          }
-        }
         platforms[i].slowPlayer ? player.speed = 1.3 : player.speed = 3
       }
       else if (platformCol === "t") {
