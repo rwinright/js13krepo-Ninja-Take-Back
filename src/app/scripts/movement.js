@@ -6,11 +6,17 @@ export const Jump = (jumpPressed, player) => {
       player.jumping = true;
       player.grounded = false;
 
+<<<<<<< HEAD
 
       if (player.dy > -20) {
         player.dy -= 5;
 
+=======
+      if (player.dy > -9) {
+        player.dy -= 4.5;
+>>>>>>> parent of f149361... Added Items
       }
+      // player.ddy -= .1;
     }
   }
   // else if (!jumpPressed && player.jumping) {

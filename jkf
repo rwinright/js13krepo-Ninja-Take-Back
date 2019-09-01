@@ -1,0 +1,293 @@
+[33mcommit 9344e5eab6061607bc41cb28afc46abd6661b1e3[m[33m ([m[1;36mHEAD -> [m[1;32mtommy[m[33m, [m[1;31morigin/tommy[m[33m)[m
+Merge: f149361 0703cf5
+Author: Tommy Waalkes <Tommy@grandcircus.co>
+Date:   Sun Sep 1 16:23:57 2019 -0400
+
+    Merge branch 'master' into tommy
+
+[33mcommit f149361a57b4f9912c803803b9c18e198adc5e8a[m
+Author: Tommy Waalkes <Tommy@grandcircus.co>
+Date:   Sun Sep 1 15:57:48 2019 -0400
+
+    Added Items
+
+[33mcommit a2758bde064e0102090d416eded18b8febabc600[m
+Author: Tommy Waalkes <Tommy@grandcircus.co>
+Date:   Thu Aug 29 17:57:03 2019 -0400
+
+    Added Gui and Player out of bounds handling
+
+[33mcommit 1217f94010bf305e37160818b2e40a4fe21e4c5e[m
+Author: Tommy Waalkes <Tommy@grandcircus.co>
+Date:   Thu Aug 29 16:26:49 2019 -0400
+
+    Added in Climbing and tweaked up gravity
+
+[33mcommit 1a504ca095683fb7c3238ea90415c756f1e8968b[m
+Author: Tommy Waalkes <Tommy@grandcircus.co>
+Date:   Wed Aug 28 17:15:55 2019 -0400
+
+    Added better collisions and made slow ground work, fixed movement on players to use their speed variable
+
+[33mcommit eb3eaaf281edc2fc2453050a10a54cc8b7d57970[m
+Author: Tommy Waalkes <Tommy@grandcircus.co>
+Date:   Wed Aug 28 16:43:16 2019 -0400
+
+    Fixed physics though gravity is a bit high, blocks now fall when they walk off platforms
+
+[33mcommit 0703cf5021c123aaae748f68baf27839b381e628[m[33m ([m[1;31morigin/master[m[33m, [m[1;32mmaster[m[33m)[m
+Merge: cc8350a 8ed23d9
+Author: Roger Winright <39418939+rwinright@users.noreply.github.com>
+Date:   Sun Aug 25 19:57:39 2019 -0400
+
+    Merge pull request #10 from rwinright/Roger
+    
+    created sprite assets
+
+[33mcommit cc8350aefb5010ff357bfe73864f00de0d78113b[m
+Merge: 947c922 5123424
+Author: Roger Winright <39418939+rwinright@users.noreply.github.com>
+Date:   Sun Aug 25 19:56:16 2019 -0400
+
+    Merge pull request #9 from rwinright/Roger
+    
+    changed the if/else block to a ternary to save space
+
+[33mcommit 8ed23d9612c97037c176729878b8c5b1a78b1da7[m
+Author: Roger Winright <rogerwinright@gmail.com>
+Date:   Sun Aug 25 19:55:18 2019 -0400
+
+    created sprite assets
+
+[33mcommit 512342466fe442208a119e9671bbe1d2868b7505[m
+Author: Roger Winright <rogerwinright@gmail.com>
+Date:   Sun Aug 25 14:49:09 2019 -0400
+
+    changed the if/else block to a ternary to save space
+
+[33mcommit 947c9223949ca44c8846a61069e437b210b69a6c[m
+Merge: 07b7524 39716b3
+Author: Roger Winright <39418939+rwinright@users.noreply.github.com>
+Date:   Sun Aug 25 14:41:06 2019 -0400
+
+    Merge pull request #8 from rwinright/Roger
+    
+    Added the ground slowing. Moved the platform for testing.
+
+[33mcommit 39716b32a2c0283d69938135e9683e2df57084e0[m
+Author: Roger <rogerwinright@gmail.com>
+Date:   Sat Aug 24 22:46:33 2019 -0400
+
+    Added the ground slowing. Moved the platform for testing.
+
+[33mcommit ba52386ff6a1ed038ff0b8c229f427202f63d878[m
+Merge: bbe5d1f 07b7524
+Author: Tommy Waalkes <Tommy@grandcircus.co>
+Date:   Thu Aug 22 14:15:56 2019 -0400
+
+    Merge pull request #7 from rwinright/master
+    
+    Pulling changes from master
+
+[33mcommit 07b7524e31a61a6c7b906f74b35f994b9ced01b4[m
+Merge: ab2fc7b 1e8b25c
+Author: Tommy Waalkes <Tommy@grandcircus.co>
+Date:   Thu Aug 22 14:13:20 2019 -0400
+
+    Merge branch 'master' of https://github.com/rwinright/js13krepo
+
+[33mcommit ab2fc7b1d6f6f4f9bb1e2bb3989e43e2b9bf835c[m
+Merge: e1aecf2 bbe5d1f
+Author: Tommy Waalkes <Tommy@grandcircus.co>
+Date:   Thu Aug 22 14:10:01 2019 -0400
+
+    Merge branch 'tommy' of https://github.com/rwinright/js13krepo
+
+[33mcommit e1aecf20c4f1ead6cd0ce3878e872e745c15052e[m
+Author: Tommy Waalkes <Tommy@grandcircus.co>
+Date:   Thu Aug 22 14:06:56 2019 -0400
+
+    Fixed up jump and platform collisions
+
+[33mcommit 1e8b25cfad69141d7b0873efec09c75e9b0d4eb1[m
+Merge: 06fe965 0751e89
+Author: Roger Winright <39418939+rwinright@users.noreply.github.com>
+Date:   Thu Aug 22 09:06:09 2019 -0400
+
+    Merge pull request #4 from rwinright/Justin
+    
+    Added play area
+
+[33mcommit 0751e8973901e37f5233817575be9fa026a1ed5b[m[33m ([m[1;31morigin/Justin[m[33m)[m
+Merge: 59d5e77 06fe965
+Author: Roger Winright <39418939+rwinright@users.noreply.github.com>
+Date:   Thu Aug 22 09:05:36 2019 -0400
+
+    Merge branch 'master' into Justin
+
+[33mcommit 06fe965fe36879395dcf60480d9c106ea46e3cf6[m
+Merge: 3a41822 bbe5d1f
+Author: Roger Winright <39418939+rwinright@users.noreply.github.com>
+Date:   Wed Aug 21 18:22:11 2019 -0400
+
+    Merge pull request #6 from rwinright/tommy
+    
+    Merge pull request #5 from rwinright/master
+
+[33mcommit bbe5d1f115394a69b043cea6b8ffb0b463266b8c[m
+Merge: fd36c18 3a41822
+Author: Roger Winright <39418939+rwinright@users.noreply.github.com>
+Date:   Wed Aug 21 18:12:58 2019 -0400
+
+    Merge pull request #5 from rwinright/master
+    
+    Merging master changes into Tommy
+
+[33mcommit 3a418220d92feccebe2a44968da6f5c1fdab7fd3[m
+Merge: 7f585d3 fd36c18
+Author: Tommy Waalkes <Tommy@grandcircus.co>
+Date:   Wed Aug 21 14:09:33 2019 -0400
+
+    Merge branch 'tommy' into master
+
+[33mcommit fd36c185fac507b2c53c299571663a35066c7152[m
+Merge: d3211f6 09581d2
+Author: Tommy Waalkes <Tommy@grandcircus.co>
+Date:   Wed Aug 21 14:01:14 2019 -0400
+
+    Merge branch 'tommy' of https://github.com/rwinright/js13krepo into tommy
+
+[33mcommit d3211f65264125866847d43da2f28bddcb9779d2[m
+Author: Tommy Waalkes <Tommy@grandcircus.co>
+Date:   Wed Aug 21 14:00:01 2019 -0400
+
+    Fixed up Jumping
+
+[33mcommit 59d5e7738c00eac3ba6ebc8bdb6cfe684984d548[m
+Author: Justin <Justin@grandcircus.co>
+Date:   Wed Aug 21 13:53:42 2019 -0400
+
+    moved spawns above spawn
+
+[33mcommit 6620c7874361b122a9b45b32242b89c75602ae55[m
+Author: Justin <Justin@grandcircus.co>
+Date:   Wed Aug 21 13:49:06 2019 -0400
+
+    Added play area. Made it dynamic scaling based on outter walls.removed sampleCode.js
+
+[33mcommit 7f585d337bbb4cbafee5e11d4cf2ae72f136fe9f[m
+Merge: 22341a1 a603097
+Author: Roger Winright <39418939+rwinright@users.noreply.github.com>
+Date:   Tue Aug 20 19:59:25 2019 -0400
+
+    Merge pull request #3 from rwinright/Roger
+    
+    Roger
+
+[33mcommit a603097b6bd9f3d89d20d154673c86c31713e6cf[m
+Author: Roger Winright <rogerwinright@gmail.com>
+Date:   Tue Aug 20 19:58:31 2019 -0400
+
+    fixed the level boundaries
+
+[33mcommit 60818ecacd59497b8c88cbb17c08c06330f4e51b[m
+Author: Roger Winright <rogerwinright@gmail.com>
+Date:   Tue Aug 20 19:53:47 2019 -0400
+
+    created mouse tool
+
+[33mcommit 22341a10f7536c29b1f9a9e49c8632f41943ea8e[m
+Merge: 78c9006 2fae613
+Author: Roger Winright <39418939+rwinright@users.noreply.github.com>
+Date:   Tue Aug 20 18:21:47 2019 -0400
+
+    Merge pull request #2 from rwinright/Roger
+    
+    Roger
+
+[33mcommit 2fae613deeb94b2f52052212c8055047fe9d4044[m
+Author: Roger Winright <rogerwinright@gmail.com>
+Date:   Tue Aug 20 18:19:48 2019 -0400
+
+    added second player
+
+[33mcommit f0dfb768a87f72ffeec5d23394ca077c1dd589a5[m
+Author: Roger Winright <rogerwinright@gmail.com>
+Date:   Tue Aug 20 17:58:36 2019 -0400
+
+    resize level
+
+[33mcommit 09581d2a45a462ae688e8f886f886b4beccf5eb8[m
+Merge: 84dae65 78c9006
+Author: Tommy Waalkes <Tommy@grandcircus.co>
+Date:   Mon Aug 19 15:56:54 2019 -0400
+
+    Merge pull request #1 from rwinright/master
+    
+    Pulling in new commits
+
+[33mcommit 78c90062cd864cf75ff814be2ef7c033fc16c536[m
+Author: Roger Winright <rogerwinright@gmail.com>
+Date:   Fri Aug 16 09:12:03 2019 -0400
+
+    refactored collision code
+
+[33mcommit 10daf686029ff49e9df48daf8083da003c8b0765[m
+Author: Roger Winright <rogerwinright@gmail.com>
+Date:   Thu Aug 15 23:39:57 2019 -0400
+
+    refactored collision code
+
+[33mcommit b29b71f0d4da620ac5f35a7263f2aaf093498a0a[m
+Author: Roger Winright <rogerwinright@gmail.com>
+Date:   Thu Aug 15 22:18:20 2019 -0400
+
+    finally fixed the jumping. Should be all set to start adding some platforms/scrolling stuff.
+
+[33mcommit 84dae6552702d0e09380034bdb36965dc52a2c55[m
+Author: Roger Winright <rogerwinright@gmail.com>
+Date:   Wed Aug 14 08:58:32 2019 -0400
+
+    experimenting with platforms
+
+[33mcommit eebd281cfba4e967d237e32b88597de9eafe4fce[m
+Author: Roger Winright <rogerwinright@gmail.com>
+Date:   Wed Aug 14 00:17:53 2019 -0400
+
+    added walking and left/right walls.
+
+[33mcommit 697fd2a5148cd9383d29f2ae2b743429b0922af1[m
+Author: Roger Winright <rogerwinright@gmail.com>
+Date:   Tue Aug 13 23:55:17 2019 -0400
+
+    procured some sample code for assistance with collisions. Added collisions and correct jumping.
+
+[33mcommit 3dd7571e94af2ba841afd699196e4d96f0baba15[m
+Author: Roger Winright <rogerwinright@gmail.com>
+Date:   Tue Aug 13 09:08:47 2019 -0400
+
+    begin creating jump physics
+
+[33mcommit 148abff6f61a8da4bd7055eaa1e88f0660dbdaf0[m
+Author: Roger Winright <rogerwinright@gmail.com>
+Date:   Tue Aug 13 00:27:10 2019 -0400
+
+    added barebones jump function.
+
+[33mcommit faaa1e7be9f190a640f5e5b7647c2e8e4fbe5299[m
+Author: Roger Winright <rogerwinright@gmail.com>
+Date:   Mon Aug 12 23:44:00 2019 -0400
+
+    created basic bounce script... just because
+
+[33mcommit f31b30f9d7fda91f5aa999ca6f3cdf28c4ad2057[m
+Author: Roger Winright <rogerwinright@gmail.com>
+Date:   Mon Aug 12 22:54:18 2019 -0400
+
+    created canvas element for screen
+
+[33mcommit 19b480f7991a73cf84155d63570cc58a1efc5997[m
+Author: Roger Winright <rogerwinright@gmail.com>
+Date:   Mon Aug 12 22:43:54 2019 -0400
+
+    created boilerplate, used a starter, installed kontra framework, initial commit
