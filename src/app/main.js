@@ -2,6 +2,7 @@ import { init, GameLoop, Sprite, initKeys, keyPressed, initPointer, pointer } fr
 import { Jump } from './scripts/movement';
 import { Movement } from './scripts/movement';
 import { Collide } from './scripts/collision';
+import p1_ss from './assets/player/P1_Walking.png';
 
 
 let { canvas, context } = init();
@@ -16,6 +17,77 @@ let platforms = [];
 let gui = [];
 let objects = [];
 
+let player_sprite = new Image();
+player_sprite.src = p1_ss;
+
+player_sprite.onload = function () {
+
+  let { canvas, context } = init();
+
+  initKeys();
+  initPointer();
+
+  let timer = 0;
+  let gravity = .09;
+
+  let platforms = [];
+  let items = [];
+
+  //P1 Spritesheet function
+
+  let P1_SpriteSheet = SpriteSheet({
+    image: player_sprite,
+    frameWidth: 72,
+    frameHeight: 72,
+    animations: {
+      // create a named animation: walk
+      walk_right: {
+        frames: [4, 5, 6, 7],
+        frameRate: 10
+      },
+      walk_left: {
+        frames: [3, 2, 1, 0],
+        frameRate: 10
+      },
+      idle_right: {
+        frames: [4],
+        frameRate: 1
+      },
+      idle_left: {
+        frames: [3],
+        frameRate: 1
+      }
+    }
+  });
+
+  //P1 Spritesheet function
+
+  let P2_SpriteSheet = SpriteSheet({
+    image: player_sprite,
+    frameWidth: 72,
+    frameHeight: 72,
+    animations: {
+      // create a named animation: walk
+      walk_right: {
+        frames: [4, 5, 6, 7],  // frames 0 through 9
+        frameRate: 10
+      },
+      walk_left: {
+        frames: [3, 2, 1, 0],
+        frameRate: 10
+      },
+      idle_right: {
+        frames: [4],
+        frameRate: 1
+      },
+      idle_left: {
+        frames: [3],
+        frameRate: 1
+      }
+    }
+  });
+
+
 const Player_1 = Sprite({
   x: (canvas.width / 2) - 20,        // starting x,y position of the sprite
   y: 40,
@@ -29,6 +101,8 @@ const Player_1 = Sprite({
   speed: 3,
   speed_base: 3,
   max_fall_speed: 4,
+  animations: P1_SpriteSheet.animations,
+  facing: 'right', // Check player facing
   climbing: false
 });
 
@@ -44,6 +118,8 @@ const Player_2 = Sprite({
   grounded: false,
   speed: 3,
   speed_base: 3,
+  animations: P1_SpriteSheet.animations,
+  facing: 'right', // Check player facing
   max_fall_speed: 4,
   climbing: false
 });
@@ -180,6 +256,17 @@ const coffee = Sprite({
   color: 'brown'
 })
 
+ const Reset_Button = Sprite({
+    x: 710,
+    y: 20,
+    height: 30,
+    width: 70,
+    color: 'green',
+    resetGame: () => {
+      location.reload();
+    }
+  });
+
 platforms.push(Ground, Ground_Slow, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform)
 
 gui.push(ItemBoxBottom, ItemBoxTop, ItemBoxLeft, ItemBoxRight, Divider);
@@ -193,65 +280,95 @@ let loop = GameLoop({  // create the main game loop
   update: function () { // game logic goes here
     Player_1.update();
     Player_2.update();
+    applyGravity(Player_1);
+      applyGravity(Player_2);
+
+      applyPlatformCollision(Player_1);
+      applyPlatformCollision(Player_2);
     for (let i = 0; i < gui.length; i++) {
       gui[i].update();
     }
+    for (let i = 0; i < items.length; i++) {
+        track(items[i])
+        if (pointerOver(items[i])) {
+          if (pointerPressed('left')) {
+            items[i].x = pointer.x - items[i].width / 2
+            items[i].y = pointer.y - items[i].height / 2
+          } else {
+            items[i].x = items[i].x
+            items[i].y = items[i].y
+          }
+        }
+        applyItemCollision(Player_1, items[i]);
+        applyItemCollision(Player_2, items[i])
+        items[i].update();
+
+      }
+     Reset_Button.update();
+      //Track pointer events on reset button
+      track(Reset_Button);
+      //You can guess what this does.
+      if (pointerOver(Reset_Button) && pointerPressed("left")) {
+        onPointerUp(() => {
+          Reset_Button.color = "red"
+          Reset_Button.resetGame();
+        })
+      },
+
+ 
+      
+
+      
+
+     
 
 
-    //Basically just keeps track of loop-time.
-    timer++;
-    currentTime = timer / 60;
 
-    //Collision collections
+    render: function () { // render the game state
 
-    Jump(keyPressed('w'), Player_1, timer);
-    Jump(keyPressed('up'), Player_2, timer);
-    Movement({ left: keyPressed('a'), right: keyPressed('d') }, Player_1);
-    Movement({ left: keyPressed('left'), right: keyPressed('right') }, Player_2)
+      Player_1.render();
+      Player_2.render();
 
-    let playerCol = Collide(Player_1, Player_2);
+      //Test Item Rendering
+      Test_Item.render();
 
-    //player collisions
+      for (let i = 0; i < platforms.length; i++) {
+        platforms[i].render();
+      }
+      
+      for (let i = 0; i < objects.length; i++) {
+        objects[i].render();
+      }
+      
+      for (let i = 0; i < gui.length; i++) {
+        gui[i].render();
+      }
 
-    if (playerCol === "l" || playerCol === "r") {
-      Player_1.dx = 0;
-      Player_2.dx = 0;
-    } else if (playerCol === "b" || playerCol === "t") {
-      Player_1.dy = 0;
-      Player_2.dy = 0;
+      Reset_Button.render();
+
+      // Good-ass mouse tool
+
+      //Text stuff!
+      context.fillStyle = 'red'
+      context.font = '12px Courier New'
+      context.fillText(`x: ${Math.floor(pointer.x)}`, pointer.x + 15, pointer.y - 15);
+      context.fillText(`y: ${Math.floor(pointer.y)}`, pointer.x + 15, pointer.y - 5);
+
+      //Text stuff!
+      context.fillStyle = 'white'
+      context.font = '10px Courier New'
+      context.fillText("RESET", Reset_Button.x + (Reset_Button.width / 2) - 12, Reset_Button.y + (Reset_Button.height / 2) + 2.5);
+
     }
 
-
-    //platform collisions
-
-    applyGravity(Player_1);
-    applyGravity(Player_2);
-    applyCollision(Player_1);
-    applyCollision(Player_2);
   },
-  render: function () { // render the game state
-    Player_1.render();
-    Player_2.render();
-    for (let i = 0; i < platforms.length; i++) {
-      platforms[i].render();
-    }
-    for (let j = 0; j < gui.length; j++) {
-      gui[j].render();
-    }
-    for (let i = 0; i < objects.length; i++) {
-      objects[i].render();
-    }
-    // Good ass mouse tool
-    context.fillText(`x: ${Math.floor(pointer.x)}`, pointer.x + 15, pointer.y - 15);
-    context.fillText(`y: ${Math.floor(pointer.y)}`, pointer.x + 15, pointer.y - 5);
-  }
-});
 
 function applyGravity(player) {
   if (player.ddy < player.max_fall_speed && !player.climbing && player.dy < 10) {
     player.ddy += gravity;
   }
 }
+
 
 function applyCollision(player) {
 
@@ -265,6 +382,7 @@ function applyCollision(player) {
       player.dx = 0;
       if (plat.isClimbable) {
         player.dy = -10;
+
       }
     }
     else if (platformCol === "b") {
@@ -316,4 +434,6 @@ function applyCollision(player) {
   }
 }
 
+
 loop.start();
+
