@@ -307,9 +307,6 @@ function applyCollision(player) {
   }
 
   if (player.collidesWith(coffee)) {
-    // objects = _.remove(objects, function (n) {
-    //   return n !== coffee;
-    // })
     objects = objects.filter(function (c) {
       return c != coffee;
     })
