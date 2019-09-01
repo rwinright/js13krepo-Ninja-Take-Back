@@ -1,4 +1,4 @@
-import { init, GameLoop, Sprite, track, SpriteSheet, initKeys, keyPressed, initPointer, pointer, onPointerUp, onPointerDown, pointerPressed, pointerOver  } from 'kontra';
+import { init, GameLoop, Sprite, track, SpriteSheet, initKeys, keyPressed, initPointer, pointer, onPointerUp, onPointerDown, pointerPressed, pointerOver } from 'kontra';
 import { Jump } from './scripts/movement';
 import { Movement } from './scripts/movement';
 import { Collide } from './scripts/collision';
@@ -18,6 +18,7 @@ player_sprite.onload = function () {
   let gravity = .09;
 
   let platforms = [];
+  let items = [];
 
   //P1 Spritesheet function
 
@@ -46,32 +47,32 @@ player_sprite.onload = function () {
     }
   });
 
-    //P1 Spritesheet function
+  //P1 Spritesheet function
 
-    let P2_SpriteSheet = SpriteSheet({
-      image: player_sprite,
-      frameWidth: 72,
-      frameHeight: 72,
-      animations: {
-        // create a named animation: walk
-        walk_right: {
-          frames: [4, 5, 6, 7],  // frames 0 through 9
-          frameRate: 10
-        },
-        walk_left: {
-          frames: [3, 2, 1, 0],
-          frameRate: 10
-        },
-        idle_right: {
-          frames: [4],
-          frameRate: 1
-        },
-        idle_left: {
-          frames: [3],
-          frameRate: 1
-        }
+  let P2_SpriteSheet = SpriteSheet({
+    image: player_sprite,
+    frameWidth: 72,
+    frameHeight: 72,
+    animations: {
+      // create a named animation: walk
+      walk_right: {
+        frames: [4, 5, 6, 7],  // frames 0 through 9
+        frameRate: 10
+      },
+      walk_left: {
+        frames: [3, 2, 1, 0],
+        frameRate: 10
+      },
+      idle_right: {
+        frames: [4],
+        frameRate: 1
+      },
+      idle_left: {
+        frames: [3],
+        frameRate: 1
       }
-    });
+    }
+  });
 
   //Ground
 
@@ -159,11 +160,22 @@ player_sprite.onload = function () {
     x: 710,
     y: 20,
     height: 30,
-    width: 70, //Interesting use of the ground slow.
+    width: 70,
     color: 'green',
-    resetGame: ()=>{
+    resetGame: () => {
       location.reload();
     }
+  })
+
+  //Items
+
+  const Test_Item = Sprite({
+    x: 624,
+    y: 148,
+    height: 20,
+    width: 20,
+    // anchor: {x: 0.5, y: 0.5},
+    color: 'blue'
   })
 
   const Player_1 = Sprite({
@@ -198,6 +210,7 @@ player_sprite.onload = function () {
   });
 
   platforms.push(Ground, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform, Ground_Slow);
+  items.push(Test_Item);
 
   let loop = GameLoop({  // create the main game loop
     update: function () { // game logic goes here
@@ -205,23 +218,44 @@ player_sprite.onload = function () {
       applyGravity(Player_1);
       applyGravity(Player_2);
 
-      applyCollision(Player_1);
-      applyCollision(Player_2);
+      applyPlatformCollision(Player_1);
+      applyPlatformCollision(Player_2);
 
       Player_1.update()
       Player_2.update()
+
+      //Test Item Update
+      //Test Item drag and drop
+
+      for (let i = 0; i < items.length; i++) {
+        track(items[i])
+        if (pointerOver(items[i])) {
+          if (pointerPressed('left')) {
+            items[i].x = pointer.x - items[i].width / 2
+            items[i].y = pointer.y - items[i].height / 2
+          } else {
+            items[i].x = items[i].x
+            items[i].y = items[i].y
+          }
+        }
+        applyItemCollision(Player_1, items[i]);
+        applyItemCollision(Player_2, items[i])
+        items[i].update();
+
+      }
+
+      
 
       Reset_Button.update();
       //Track pointer events on reset button
       track(Reset_Button);
       //You can guess what this does.
-      if(pointerOver(Reset_Button) && pointerPressed("left")){
-        onPointerUp(()=>{
+      if (pointerOver(Reset_Button) && pointerPressed("left")) {
+        onPointerUp(() => {
           Reset_Button.color = "red"
           Reset_Button.resetGame();
         })
       }
-      
 
       //Basically just keeps track of loop-time.
       timer++;
@@ -232,14 +266,13 @@ player_sprite.onload = function () {
       Movement({ left: keyPressed('a'), right: keyPressed('d') }, Player_1);
       Movement({ left: keyPressed('left'), right: keyPressed('right') }, Player_2);
 
-      if(Player_1.collidesWith(Player_2)){
+      if (Player_1.collidesWith(Player_2)) {
         Player_1.x = Player_1.x + 1;
       }
 
-      if(Player_2.collidesWith(Player_1)){
+      if (Player_2.collidesWith(Player_1)) {
         Player_2.x = Player_2.x - 1;
       }
-
 
     },
 
@@ -247,6 +280,9 @@ player_sprite.onload = function () {
 
       Player_1.render();
       Player_2.render();
+
+      //Test Item Rendering
+      Test_Item.render();
 
       for (let i = 0; i < platforms.length; i++) {
         platforms[i].render();
@@ -280,7 +316,7 @@ player_sprite.onload = function () {
     }
   }
 
-  function applyCollision(player) {
+  function applyPlatformCollision(player) {
 
     for (let i = 0; i < platforms.length; i++) {
       platforms[i].update();
@@ -300,6 +336,14 @@ player_sprite.onload = function () {
         player.dy = 0;
       }
 
+    }
+  }
+
+  function applyItemCollision(player, item){
+    if (player.collidesWith(item)) {
+      //Set up better collision detection
+      player.x = item.x;
+      player.y = item.y - item.width;
     }
   }
 
