@@ -248,13 +248,21 @@ p1_spriteSheet.onload = function () {
     color: 'brown'
   })
 
+  const end_flag = Sprite({
+    x: 740,
+    y: 150,
+    color: 'red',
+    height: 20,
+    width: 40
+  })
+
   platforms.push(Ground, Ground_Slow, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform)
 
   gui.push(ItemBoxBottom, ItemBoxTop, ItemBoxLeft, ItemBoxRight, Divider);
 
-  objects.push(rocket, portal, coffee)
+  objects.push(rocket, portal, coffee, end_flag)
   //Text stuff!
-  context.fillStyle = 'black'
+  context.fillStyle = 'teal'
   context.font = '10px Courier New'
 
   let loop = GameLoop({  // create the main game loop
