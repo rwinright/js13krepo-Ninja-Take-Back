@@ -15,10 +15,11 @@ player_sprite.onload = function () {
   initPointer();
 
   let timer = 0;
-  let gravity = .09;
+  let gravity = .1;
 
   let platforms = [];
-  let items = [];
+  let gui = [];
+  let objects = [];
 
   //P1 Spritesheet function
 
@@ -123,7 +124,7 @@ player_sprite.onload = function () {
     width: 50,
     color: 'black',
     slowPlayer: false,
-    hurtPlayer: false
+    isClimbable: true
   })
 
   const End = Sprite({//Dynamically adjusts to be next to right wall
@@ -182,14 +183,16 @@ player_sprite.onload = function () {
     x: (Spawn.width + Left_Wall.width) - 20, // starting x,y position of the sprite based on spawn
     y: Spawn.y - 40,
     animations: P1_SpriteSheet.animations,
-    width: 20,
-    height: 20,
+    width: 30,
+    height: 30,
     facing: 'right', // Check player facing
     dx: 0,
     dy: 0,
     jumping: true,
     grounded: false,
+    climbing: false,
     speed: 3,
+    speed_base: 3,
     max_fall_speed: 10
   });
 
@@ -206,11 +209,90 @@ player_sprite.onload = function () {
     jumping: true,
     grounded: false,
     speed: 3,
+    speed_base: 3,
     max_fall_speed: 10
   });
 
-  platforms.push(Ground, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform, Ground_Slow);
-  items.push(Test_Item);
+  // items.push(Test_Item);
+  const ItemBoxBottom = Sprite({
+    x: 0,
+    y: 50,
+    height: 10,
+    width: canvas.width,
+    color: 'black'
+  })
+
+  const ItemBoxTop = Sprite({
+    x: 0,
+    y: 0,
+    width: canvas.width,
+    height: 10,
+    color: 'black'
+  })
+
+  const ItemBoxLeft = Sprite({
+    x: 0,
+    y: 0,
+    height: 50,
+    width: 15,
+    color: 'black'
+  })
+
+  const ItemBoxRight = Sprite({
+    height: 50,
+    width: 15,
+    x: canvas.width - 15,
+    y: 0,
+    color: 'black'
+  })
+
+  const Divider = Sprite({
+    height: 50,
+    width: 20,
+    x: canvas.width / 2,
+    y: 0,
+    color: 'black'
+  })
+
+  const rocket = Sprite({
+    x: 140,
+    y: 200,
+    height: 10,
+    width: 100
+  })
+
+  const portal = Sprite({
+    x: 200,
+    y: 200,
+    height: 20,
+    width: 10,
+    color: 'purple'
+  })
+
+  const coffee = Sprite({
+    x: 200,
+    y: 190,
+    width: 10,
+    height: 15,
+    color: 'brown'
+  })
+
+  const end_flag = Sprite({
+    x: 740,
+    y: 150,
+    color: 'red',
+    height: 20,
+    width: 40
+  })
+
+  platforms.push(Ground, Ground_Slow, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform)
+
+  gui.push(ItemBoxBottom, ItemBoxTop, ItemBoxLeft, ItemBoxRight, Divider);
+
+  objects.push(rocket, portal, coffee, end_flag)
+  //Text stuff!
+  context.fillStyle = 'teal'
+  context.font = '10px Courier New'
 
   let loop = GameLoop({  // create the main game loop
     update: function () { // game logic goes here
@@ -227,22 +309,22 @@ player_sprite.onload = function () {
       //Test Item Update
       //Test Item drag and drop
 
-      for (let i = 0; i < items.length; i++) {
-        track(items[i])
-        if (pointerOver(items[i])) {
-          if (pointerPressed('left')) {
-            items[i].x = pointer.x - items[i].width / 2
-            items[i].y = pointer.y - items[i].height / 2
-          } else {
-            items[i].x = items[i].x
-            items[i].y = items[i].y
-          }
-        }
-        applyItemCollision(Player_1, items[i]);
-        applyItemCollision(Player_2, items[i])
-        items[i].update();
+      // for (let i = 0; i < items.length; i++) {
+      //   track(items[i])
+      //   if (pointerOver(items[i])) {
+      //     if (pointerPressed('left')) {
+      //       items[i].x = pointer.x - items[i].width / 2
+      //       items[i].y = pointer.y - items[i].height / 2
+      //     } else {
+      //       items[i].x = items[i].x
+      //       items[i].y = items[i].y
+      //     }
+      //   }
+      //   applyItemCollision(Player_1, items[i]);
+      //   applyItemCollision(Player_2, items[i])
+      //   items[i].update();
 
-      }
+      // }
 
       
 
@@ -287,6 +369,12 @@ player_sprite.onload = function () {
       for (let i = 0; i < platforms.length; i++) {
         platforms[i].render();
       }
+      for (let i = 0; i < objects.length; i++) {
+        objects[i].render();
+      }
+      for (let i = 0; i < gui.length; i++) {
+        gui[i].render();
+      }
 
       Reset_Button.render();
 
@@ -306,35 +394,74 @@ player_sprite.onload = function () {
     }
   });
 
+
   function applyGravity(player) {
-    if (player.grounded && !player.jumping) {
-      player.dy = 0;
-    } else {
-      if (player.dy < player.max_fall_speed) {
-        player.dy += gravity;
-      }
+    if (player.dy < player.max_fall_speed && !player.climbing && player.dy < 10) {
+      player.dy += gravity;
     }
   }
 
   function applyPlatformCollision(player) {
 
     for (let i = 0; i < platforms.length; i++) {
+      let plat = platforms[i];
       platforms[i].update();
 
       let platformCol = Collide(player, platforms[i]);
 
       if (platformCol === "l" || platformCol === "r") {
         player.dx = 0;
+        if (plat.isClimbable) {
+          player.dy = -10;
+
+        }
       }
       else if (platformCol === "b") {
         player.dy = 0;
+        player.ddy = 0;
         player.jumping = false;
         player.grounded = true;
         platforms[i].slowPlayer ? player.speed = 1.3 : player.speed = 3
+        player.climbing = false;
+        player.speed = player.speed_base;
       }
       else if (platformCol === "t") {
         player.dy = 0;
+        player.climbing = false;
       }
+      let slowCol = Collide(player, Ground_Slow);
+
+      if (slowCol === "b") {
+        player.speed = player.speed_base / 2;
+      }
+
+
+
+      //respawn if out of bounds
+      if (player.x > canvas.width || player.y > canvas.height || player.x < 0 || player.y < 0) {
+        player.x = 30;
+        player.y = 170;
+        player.dx = 0;
+        player.ddy = 0;
+      }
+
+    }
+    if (player.collidesWith(rocket)) {
+      player.ddy = 0;
+      player.dy = -9;
+    }
+
+    if (player.collidesWith(portal)) {
+      player.x = 30;
+      player.y = 185;
+    }
+
+    if (player.collidesWith(coffee)) {
+      objects = objects.filter(function (c) {
+        return c != coffee;
+      })
+
+      player.speed_base = 5;
 
     }
   }
