@@ -15,7 +15,7 @@ p1_spriteSheet.onload = function () {
 
   let timer = 0;
   let currentTime = 0;
-  let gravity = .09;
+  let gravity = .1;
 
   let platforms = [];
   let gui = [];
