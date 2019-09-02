@@ -144,7 +144,7 @@ p1_spriteSheet.onload = function () {
   const Platform = Sprite({
     x: Ground_Slow.width / 2,
     // y: (Spawn.y + End.y) / 2,
-    y: 360, // Set here for testing.
+    y: 100, // Set here for testing.
     height: 5,
     width: Ground_Slow.width / 4, //Interesting use of the ground slow.
     color: 'brown',
@@ -165,7 +165,9 @@ p1_spriteSheet.onload = function () {
     climbing: false,
     speed: 3,
     speed_base: 3,
-    max_fall_speed: 10
+    max_fall_speed: 10,
+    name: 'Red',
+    wins: false
   });
 
   const Player_2 = Sprite({
@@ -182,7 +184,9 @@ p1_spriteSheet.onload = function () {
     grounded: false,
     speed: 3,
     speed_base: 3,
-    max_fall_speed: 10
+    max_fall_speed: 10,
+    name: "billy",
+    wins: false
   });
 
   const ItemBoxBottom = Sprite({
@@ -362,6 +366,7 @@ p1_spriteSheet.onload = function () {
 
       if (slowCol === "b") {
         player.speed = player.speed_base / 2;
+        player.dy = 0;
       }
 
 
@@ -389,11 +394,18 @@ p1_spriteSheet.onload = function () {
       objects = objects.filter(function (c) {
         return c != coffee;
       })
-
       player.speed_base = 5;
 
     }
+    if (player.collidesWith(end_flag)) {
+      objects = objects.filter(function (c) {
+        return c != end_flag;
+      })
+      if (!player.wins) {
+        alert(`${player.name} wins!!!`);
+        player.wins = true;
+      }
+    }
   }
-
   loop.start();
 }
