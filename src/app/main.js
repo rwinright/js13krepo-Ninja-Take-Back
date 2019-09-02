@@ -155,8 +155,8 @@ p1_spriteSheet.onload = function () {
     x: (Spawn.width + Left_Wall.width) - 20, // starting x,y position of the sprite based on spawn
     y: Spawn.y - 40,
     animations: P1_SpriteSheet.animations,
-    width: 20,
-    height: 20,
+    width: 30,
+    height: 30,
     facing: 'right', // Check player facing
     dx: 0,
     dy: 0,
