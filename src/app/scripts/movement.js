@@ -26,6 +26,7 @@ export const Movement = (keyPress, player) => {
     player.facing = 'right'
     player.dx = player.speed;
     player.playAnimation('walk_right')
+    
   } else if (keyPress.left) {
     // left arrow
     player.dx = -player.speed;

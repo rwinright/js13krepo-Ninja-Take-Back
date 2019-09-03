@@ -260,9 +260,10 @@ player_sprite.onload = function () {
 
   const rocket = Sprite({
     x: 140,
-    y: 200,
+    y: 300,
     height: 10,
-    width: 100
+    width: 100,
+    color:"gold"
   })
 
   const portal = Sprite({
@@ -281,6 +282,37 @@ player_sprite.onload = function () {
     color: 'brown'
   })
 
+  const bomb = Sprite({
+    x: 200,
+    y: 150,
+    width: 20,
+    height: 20,
+    color: 'dimgray'
+  })
+  const confuse = Sprite({
+    x: 100,
+    y: 100,
+    width: 10,
+    height: 15,
+    color: 'pink'
+  })
+
+  const turret = Sprite({
+    x: 400,
+    y: 350,
+    height: 30,
+    width: 20,
+    color: 'DarkSlateGrey'
+  })
+
+  const bullet = Sprite({
+    x: -100,
+    y: -100,
+    height: 5,
+    width: 10,
+    color: 'black'
+  })
+
   const end_flag = Sprite({
     x: 740,
     y: 150,
@@ -293,7 +325,7 @@ player_sprite.onload = function () {
 
   gui.push(ItemBoxBottom, ItemBoxTop, ItemBoxLeft, ItemBoxRight, Divider);
 
-  objects.push(rocket, portal, coffee, end_flag)
+  objects.push(rocket, portal, coffee, bomb, confuse, turret, bullet, end_flag)
   //Text stuff!
   context.fillStyle = 'teal'
   context.font = '10px Courier New'
@@ -309,7 +341,7 @@ player_sprite.onload = function () {
 
       Player_1.update()
       Player_2.update()
-
+      bullet.update()
       //Test Item Update
       //Test Item drag and drop
 
@@ -466,8 +498,35 @@ player_sprite.onload = function () {
         return c != coffee;
       })
       player.speed_base = 5;
-
     }
+
+    if (player.collidesWith(bomb)) {
+      objects = objects.filter(function (b) {
+        return b != bomb;
+      })
+      player.dy = -20; 
+      player.dx = -20; 
+    }
+
+    if (player.collidesWith(confuse)) {
+      objects = objects.filter(function (c) {
+        return c != confuse;
+      })
+      player.speed_base = -player.speed_base;
+    }
+
+    if (player.collidesWith(turret)) {
+      bullet.x = turret.x-5;
+      bullet.y = turret.y+5;
+      bullet.ddx = -.5;
+      bullet.dx=-1;
+    }
+
+    if (player.collidesWith(bullet)) {
+      player.dx = -1;
+      player.dy = -1;
+    }
+
     if (player.collidesWith(end_flag)) {
       objects = objects.filter(function (c) {
         return c != end_flag;
