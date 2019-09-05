@@ -195,7 +195,8 @@ player_sprite.onload = function () {
     speed_base: 3,
     max_fall_speed: 10,
     name: 'Red',
-    wins: false
+    wins: false,
+    confused: false
   });
 
   const Player_2 = Sprite({
@@ -214,7 +215,8 @@ player_sprite.onload = function () {
     speed_base: 3,
     max_fall_speed: 10,
     name: "billy",
-    wins: false
+    wins: false,
+    confused: false
   });
 
   // items.push(Test_Item);
@@ -263,7 +265,7 @@ player_sprite.onload = function () {
     y: 300,
     height: 10,
     width: 100,
-    color:"gold"
+    color: "gold"
   })
 
   const portal = Sprite({
@@ -362,7 +364,7 @@ player_sprite.onload = function () {
 
       // }
 
-      
+
 
       Reset_Button.update();
       //Track pointer events on reset button
@@ -400,7 +402,7 @@ player_sprite.onload = function () {
       Player_2.render();
 
       //Test Item Rendering
-      Test_Item.render();
+      //Test_Item.render();
 
       for (let i = 0; i < platforms.length; i++) {
         platforms[i].render();
@@ -504,8 +506,8 @@ player_sprite.onload = function () {
       objects = objects.filter(function (b) {
         return b != bomb;
       })
-      player.dy = -20; 
-      player.dx = -20; 
+      player.dy = -20;
+      player.dx = -20;
     }
 
     if (player.collidesWith(confuse)) {
@@ -516,10 +518,10 @@ player_sprite.onload = function () {
     }
 
     if (player.collidesWith(turret)) {
-      bullet.x = turret.x-5;
-      bullet.y = turret.y+5;
+      bullet.x = turret.x - 5;
+      bullet.y = turret.y + 5;
       bullet.ddx = -.5;
-      bullet.dx=-1;
+      bullet.dx = -1;
     }
 
     if (player.collidesWith(bullet)) {
@@ -538,7 +540,7 @@ player_sprite.onload = function () {
     }
   }
 
-  function applyItemCollision(player, item){
+  function applyItemCollision(player, item) {
     if (player.collidesWith(item)) {
       //Set up better collision detection
       player.x = item.x;

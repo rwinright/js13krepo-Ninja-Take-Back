@@ -24,12 +24,24 @@ export const Movement = (keyPress, player) => {
   if (keyPress.right) {
     // right arrow
     player.facing = 'right'
-    player.dx = player.speed;
+    if (player.confused) {
+      player.dx = -player.speed;
+    }
+    else {
+      player.dx = player.speed;
+    }
     player.playAnimation('walk_right')
-    
+
   } else if (keyPress.left) {
     // left arrow
-    player.dx = -player.speed;
+
+
+    if (player.confused) {
+      player.dx = player.speed;
+    }
+    else {
+      player.dx = -player.speed;
+    }
     player.facing = 'left'
     player.playAnimation('walk_left')
   } else {
