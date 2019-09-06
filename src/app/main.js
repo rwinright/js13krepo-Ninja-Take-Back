@@ -2,6 +2,7 @@ import { init, GameLoop, Sprite, track, SpriteSheet, initKeys, keyPressed, initP
 import { Jump } from './scripts/movement';
 import { Movement } from './scripts/movement';
 import { Collide } from './scripts/collision';
+import { Item } from './scripts/item';
 import p1_ss from './assets/player/P1_Walking.png';
 
 let player_sprite = new Image();
@@ -169,16 +170,6 @@ player_sprite.onload = function () {
   })
 
   //Items
-
-  const Test_Item = Sprite({
-    x: 624,
-    y: 148,
-    height: 20,
-    width: 20,
-    // anchor: {x: 0.5, y: 0.5},
-    color: 'blue'
-  })
-
   const Player_1 = Sprite({
     x: (Spawn.width + Left_Wall.width) - 20, // starting x,y position of the sprite based on spawn
     y: Spawn.y - 40,
@@ -260,44 +251,46 @@ player_sprite.onload = function () {
     color: 'black'
   })
 
-  const rocket = Sprite({
-    x: 140,
-    y: 300,
-    height: 10,
-    width: 100,
-    color: "gold"
-  })
+  const spring = new Item(140, 300, 10, 100, 'gold', false,
+    function (player) {
+      player.ddy = 0;
+      player.dy = -9;
+    });
 
-  const portal = Sprite({
-    x: 200,
-    y: 200,
-    height: 20,
-    width: 10,
-    color: 'purple'
-  })
+  const portal = new Item(200, 200, 30, 10, 'purple', false,
+    function (player) {
+      player.x = 30;
+      player.y = 185;
+      player.dx = 0;
+    });
 
-  const coffee = Sprite({
-    x: 200,
-    y: 190,
-    width: 10,
-    height: 15,
-    color: 'brown'
-  })
+  const coffee = new Item(200, 190, 10, 15, 'brown', true,
+    function (player) {
+      if (this.active) {
+        this.active = false;
+        player.speed_base = 5;
+      }
+    }
+  )
 
-  const bomb = Sprite({
-    x: 200,
-    y: 150,
-    width: 20,
-    height: 20,
-    color: 'dimgray'
-  })
-  const confuse = Sprite({
-    x: 100,
-    y: 100,
-    width: 10,
-    height: 15,
-    color: 'pink'
-  })
+  const bomb = new Item(330, 360, 20, 20, 'dimgray', true,
+    function (player) {
+      if (this.active) {
+        player.dx = -player.dx * 5;
+        player.dy = -player.dy * 2;
+        this.active = false;
+      }
+    }
+  );
+
+  const confuse = new Item(100, 100, 15, 10, 'pink', true,
+    function (player) {
+      if (this.active) {
+        this.active = false;
+        player.speed_base = -player.speed_base;
+      }
+    }
+  );
 
   const turret = Sprite({
     x: 400,
@@ -315,19 +308,21 @@ player_sprite.onload = function () {
     color: 'black'
   })
 
-  const end_flag = Sprite({
-    x: 740,
-    y: 150,
-    color: 'red',
-    height: 20,
-    width: 40
-  })
+  const end_flag = new Item(740, 150, 20, 40, 'color', true,
+
+    function (player) {
+      if (!player.wins) {
+        alert(`${player.name} wins!!!`);
+        player.wins = true;
+      }
+      this.active = false;
+    });
 
   platforms.push(Ground, Ground_Slow, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform)
 
   gui.push(ItemBoxBottom, ItemBoxTop, ItemBoxLeft, ItemBoxRight, Divider);
 
-  objects.push(rocket, portal, coffee, bomb, confuse, turret, bullet, end_flag)
+  objects.push(spring, portal, coffee, bomb, confuse, turret, bullet, end_flag)
   //Text stuff!
   context.fillStyle = 'teal'
   context.font = '10px Courier New'
@@ -485,36 +480,16 @@ player_sprite.onload = function () {
       }
 
     }
-    if (player.collidesWith(rocket)) {
-      player.ddy = 0;
-      player.dy = -9;
-    }
-
-    if (player.collidesWith(portal)) {
-      player.x = 30;
-      player.y = 185;
-    }
-
-    if (player.collidesWith(coffee)) {
-      objects = objects.filter(function (c) {
-        return c != coffee;
-      })
-      player.speed_base = 5;
-    }
-
-    if (player.collidesWith(bomb)) {
-      objects = objects.filter(function (b) {
-        return b != bomb;
-      })
-      player.dy = -20;
-      player.dx = -20;
-    }
-
-    if (player.collidesWith(confuse)) {
-      objects = objects.filter(function (c) {
-        return c != confuse;
-      })
-      player.speed_base = -player.speed_base;
+    for (let i = 0; i < objects.length; i++) {
+      let o = objects[i];
+      if (player.collidesWith(o)) {
+        o.effect(player);
+      }
+      if (!o.active) {
+        objects = objects.filter(function (c) {
+          return c != o;
+        })
+      }
     }
 
     if (player.collidesWith(turret)) {
@@ -527,24 +502,6 @@ player_sprite.onload = function () {
     if (player.collidesWith(bullet)) {
       player.dx = -1;
       player.dy = -1;
-    }
-
-    if (player.collidesWith(end_flag)) {
-      objects = objects.filter(function (c) {
-        return c != end_flag;
-      })
-      if (!player.wins) {
-        alert(`${player.name} wins!!!`);
-        player.wins = true;
-      }
-    }
-  }
-
-  function applyItemCollision(player, item) {
-    if (player.collidesWith(item)) {
-      //Set up better collision detection
-      player.x = item.x;
-      player.y = item.y - item.width;
     }
   }
   loop.start();
