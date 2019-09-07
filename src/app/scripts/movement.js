@@ -21,7 +21,10 @@ export const Jump = (jumpPressed, player) => {
 
 
 export const Movement = (keyPress, player) => {
-  if (keyPress.right) {
+  if (player.explode) {
+
+  }
+  else if (keyPress.right) {
     // right arrow
     player.facing = 'right'
     if (player.confused) {
@@ -32,10 +35,9 @@ export const Movement = (keyPress, player) => {
     }
     player.playAnimation('walk_right')
 
-  } else if (keyPress.left) {
+  }
+  else if (keyPress.left) {
     // left arrow
-
-
     if (player.confused) {
       player.dx = player.speed;
     }
@@ -44,7 +46,8 @@ export const Movement = (keyPress, player) => {
     }
     player.facing = 'left'
     player.playAnimation('walk_left')
-  } else {
+  }
+  else {
     player.dx = 0;
     if (player.facing === 'left') {
       player.playAnimation('idle_left');

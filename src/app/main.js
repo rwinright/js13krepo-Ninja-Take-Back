@@ -187,7 +187,9 @@ player_sprite.onload = function () {
     max_fall_speed: 10,
     name: 'Red',
     wins: false,
-    confused: false
+    confused: false,
+    explode: false
+
   });
 
   const Player_2 = Sprite({
@@ -210,7 +212,6 @@ player_sprite.onload = function () {
     confused: false
   });
 
-  // items.push(Test_Item);
   const ItemBoxBottom = Sprite({
     x: 0,
     y: 50,
@@ -275,9 +276,12 @@ player_sprite.onload = function () {
 
   const bomb = new Item(330, 360, 20, 20, 'dimgray', true,
     function (player) {
+      player.explode = true;
       if (this.active) {
-        player.dx = -player.dx * 5;
-        player.dy = -player.dy * 2;
+        player.ddy = 0;
+        player.dy = -5;
+        player.ddx = 0;
+        player.dx = -player.dx * 4;
         this.active = false;
       }
     }
@@ -308,7 +312,7 @@ player_sprite.onload = function () {
     color: 'black'
   })
 
-  const end_flag = new Item(740, 150, 20, 40, 'color', true,
+  const end_flag = new Item(740, 150, 20, 40, 'red', true,
 
     function (player) {
       if (!player.wins) {
@@ -441,7 +445,9 @@ player_sprite.onload = function () {
       platforms[i].update();
 
       let platformCol = Collide(player, platforms[i]);
-
+      if (platformCol !== null && player.explode) {
+        player.explode = false;
+      }
       if (platformCol === "l" || platformCol === "r") {
         player.dx = 0;
         if (plat.isClimbable) {
