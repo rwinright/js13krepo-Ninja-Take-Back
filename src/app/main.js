@@ -2,6 +2,7 @@ import { init, GameLoop, Sprite, track, SpriteSheet, initKeys, keyPressed, initP
 import { Jump } from './scripts/movement';
 import { Movement } from './scripts/movement';
 import { Collide } from './scripts/collision';
+import { Item } from './scripts/item';
 import p1_ss from './assets/player/P1_Walking.png';
 
 let player_sprite = new Image();
@@ -169,16 +170,6 @@ player_sprite.onload = function () {
   })
 
   //Items
-
-  const Test_Item = Sprite({
-    x: 624,
-    y: 148,
-    height: 20,
-    width: 20,
-    // anchor: {x: 0.5, y: 0.5},
-    color: 'blue'
-  })
-
   const Player_1 = Sprite({
     x: (Spawn.width + Left_Wall.width) - 20, // starting x,y position of the sprite based on spawn
     y: Spawn.y - 40,
@@ -195,7 +186,10 @@ player_sprite.onload = function () {
     speed_base: 3,
     max_fall_speed: 10,
     name: 'Red',
-    wins: false
+    wins: false,
+    confused: false,
+    explode: false
+
   });
 
   const Player_2 = Sprite({
@@ -214,10 +208,10 @@ player_sprite.onload = function () {
     speed_base: 3,
     max_fall_speed: 10,
     name: "billy",
-    wins: false
+    wins: false,
+    confused: false
   });
 
-  // items.push(Test_Item);
   const ItemBoxBottom = Sprite({
     x: 0,
     y: 50,
@@ -258,42 +252,81 @@ player_sprite.onload = function () {
     color: 'black'
   })
 
-  const rocket = Sprite({
-    x: 140,
-    y: 200,
-    height: 10,
-    width: 100
+  const spring = new Item(140, 300, 10, 100, 'gold', false,
+    function (player) {
+      player.ddy = 0;
+      player.dy = -9;
+    });
+
+  const portal = new Item(200, 200, 30, 10, 'purple', false,
+    function (player) {
+      player.x = 30;
+      player.y = 185;
+      player.dx = 0;
+    });
+
+  const coffee = new Item(200, 190, 10, 15, 'brown', true,
+    function (player) {
+      if (this.active) {
+        this.active = false;
+        player.speed_base = 5;
+      }
+    }
+  )
+
+  const bomb = new Item(330, 360, 20, 20, 'dimgray', true,
+    function (player) {
+      player.explode = true;
+      if (this.active) {
+        player.ddy = 0;
+        player.dy = -5;
+        player.ddx = 0;
+        player.dx = -player.dx * 4;
+        this.active = false;
+      }
+    }
+  );
+
+  const confuse = new Item(100, 100, 15, 10, 'pink', true,
+    function (player) {
+      if (this.active) {
+        this.active = false;
+        player.speed_base = -player.speed_base;
+      }
+    }
+  );
+
+  const turret = Sprite({
+    x: 400,
+    y: 350,
+    height: 30,
+    width: 20,
+    color: 'DarkSlateGrey'
   })
 
-  const portal = Sprite({
-    x: 200,
-    y: 200,
-    height: 20,
+  const bullet = Sprite({
+    x: -100,
+    y: -100,
+    height: 5,
     width: 10,
-    color: 'purple'
+    color: 'black'
   })
 
-  const coffee = Sprite({
-    x: 200,
-    y: 190,
-    width: 10,
-    height: 15,
-    color: 'brown'
-  })
+  const end_flag = new Item(740, 150, 20, 40, 'red', true,
 
-  const end_flag = Sprite({
-    x: 740,
-    y: 150,
-    color: 'red',
-    height: 20,
-    width: 40
-  })
+    function (player) {
+      if (!player.wins) {
+        alert(`${player.name} wins!!!`);
+        player.wins = true;
+      }
+      this.active = false;
+    });
 
   platforms.push(Ground, Ground_Slow, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform)
 
   gui.push(ItemBoxBottom, ItemBoxTop, ItemBoxLeft, ItemBoxRight, Divider);
 
-  objects.push(rocket, portal, coffee, end_flag)
+  objects.push(spring, portal, coffee, bomb, confuse, turret, bullet, end_flag)
   //Text stuff!
   context.fillStyle = 'teal'
   context.font = '10px Courier New'
@@ -309,7 +342,7 @@ player_sprite.onload = function () {
 
       Player_1.update()
       Player_2.update()
-
+      bullet.update()
       //Test Item Update
       //Test Item drag and drop
 
@@ -330,7 +363,7 @@ player_sprite.onload = function () {
 
       // }
 
-      
+
 
       Reset_Button.update();
       //Track pointer events on reset button
@@ -368,7 +401,7 @@ player_sprite.onload = function () {
       Player_2.render();
 
       //Test Item Rendering
-      Test_Item.render();
+      //Test_Item.render();
 
       for (let i = 0; i < platforms.length; i++) {
         platforms[i].render();
@@ -412,7 +445,9 @@ player_sprite.onload = function () {
       platforms[i].update();
 
       let platformCol = Collide(player, platforms[i]);
-
+      if (platformCol !== null && player.explode) {
+        player.explode = false;
+      }
       if (platformCol === "l" || platformCol === "r") {
         player.dx = 0;
         if (plat.isClimbable) {
@@ -451,39 +486,28 @@ player_sprite.onload = function () {
       }
 
     }
-    if (player.collidesWith(rocket)) {
-      player.ddy = 0;
-      player.dy = -9;
-    }
-
-    if (player.collidesWith(portal)) {
-      player.x = 30;
-      player.y = 185;
-    }
-
-    if (player.collidesWith(coffee)) {
-      objects = objects.filter(function (c) {
-        return c != coffee;
-      })
-      player.speed_base = 5;
-
-    }
-    if (player.collidesWith(end_flag)) {
-      objects = objects.filter(function (c) {
-        return c != end_flag;
-      })
-      if (!player.wins) {
-        alert(`${player.name} wins!!!`);
-        player.wins = true;
+    for (let i = 0; i < objects.length; i++) {
+      let o = objects[i];
+      if (player.collidesWith(o)) {
+        o.effect(player);
+      }
+      if (!o.active) {
+        objects = objects.filter(function (c) {
+          return c != o;
+        })
       }
     }
-  }
 
-  function applyItemCollision(player, item){
-    if (player.collidesWith(item)) {
-      //Set up better collision detection
-      player.x = item.x;
-      player.y = item.y - item.width;
+    if (player.collidesWith(turret)) {
+      bullet.x = turret.x - 5;
+      bullet.y = turret.y + 5;
+      bullet.ddx = -.5;
+      bullet.dx = -1;
+    }
+
+    if (player.collidesWith(bullet)) {
+      player.dx = -1;
+      player.dy = -1;
     }
   }
   loop.start();
