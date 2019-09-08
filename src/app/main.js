@@ -5,9 +5,11 @@ import { Collide } from './scripts/collision';
 import { Item } from './scripts/item';
 import p1_ss from './assets/player/P1_Walking.png';
 import background_image from './assets/level/js13k-map.png';
+import { playSound } from './assets/sfx/soundEffects';
 
 let player_sprite = new Image();
 player_sprite.src = p1_ss;
+
 let background = new Image();
 background.src = background_image;
 
@@ -298,6 +300,7 @@ background.src = background_image;
         this.active = false;
         player.speed_base = 5;
       }
+      playSound([1, , 0.3201, , 0.4743, 0.3202, , 0.0833, , 0.4207, 0.4278, , , , , , , , 1, , , , , 0.5])
     }
   )
 
@@ -311,6 +314,7 @@ background.src = background_image;
         player.dx = -player.dx * 4;
         this.active = false;
       }
+      playSound([3, , 0.3708, 0.5822, 0.3851, 0.0584, , -0.0268, , , , -0.0749, 0.7624, , , , , , 1, , , , , 0.5]) //Explosion sound
     }
   );
 
@@ -373,22 +377,28 @@ background.src = background_image;
       //Test Item Update
       //Test Item drag and drop
 
-      // for (let i = 0; i < items.length; i++) {
-      //   track(items[i])
-      //   if (pointerOver(items[i])) {
-      //     if (pointerPressed('left')) {
-      //       items[i].x = pointer.x - items[i].width / 2
-      //       items[i].y = pointer.y - items[i].height / 2
-      //     } else {
-      //       items[i].x = items[i].x
-      //       items[i].y = items[i].y
-      //     }
-      //   }
-      //   applyItemCollision(Player_1, items[i]);
-      //   applyItemCollision(Player_2, items[i])
-      //   items[i].update();
+      for (let i = 0; i < objects.length; i++) {
+        track(objects[i])
+        if (pointerOver(objects[i])) {
+          if (pointerPressed('left')) {
+            objects[i].x = pointer.x - objects[i].width / 2
+            objects[i].y = pointer.y - objects[i].height / 2
+          } else {
+            objects[i].x = objects[i].x
+            objects[i].y = objects[i].y
+          }
+        }
 
-      // }
+        //Make sure objects never go past/beyond spawn/end.
+        if(objects[i].x <= 60){
+          objects[i].x = objects[i].x + Spawn.width / 12
+        } else if((objects[i].x + objects[i].width) >= 740){
+          objects[i].x = 740 - End.width
+        }
+        
+        objects[i].update();
+
+      }
 
 
       //GUI Buttons
@@ -434,17 +444,17 @@ background.src = background_image;
     render: function () { // render the game state
 
       Background.render();
-      
+
       Player_1.render();
       Player_2.render();
-      
+
       //Test Item Rendering
       //Test_Item.render();
 
       //Just comment this back in if you wanna generate the platform hitboxes
-      
+
       for (let i = 0; i < platforms.length; i++) {
-          toggleHB ? platforms[i].render() : null;
+        toggleHB ? platforms[i].render() : null;
       }
 
       for (let i = 0; i < objects.length; i++) {

@@ -1,21 +1,17 @@
+import { playSound }  from '../assets/sfx/soundEffects';
+
 export const Jump = (jumpPressed, player) => {
-  // player.scale(-1, 1)
-  // player.context.canvas;
   if (jumpPressed) {
     if (!player.jumping && player.grounded) {
       player.jumping = true;
       player.grounded = false;
-
+      playSound([0,,0.1812,,0.1349,0.4524,,0.2365,,,,,,0.0819,,,,,1,,,,,0.5]);
       if (player.dy > -20) {
         player.dy -= 5;
       }
-      // player.ddy -= .1;
+      //jump sound!
     }
   }
-  // else if (!jumpPressed && player.jumping) {
-  //   //player.jumping = false;
-  //   //player.dy += .3;
-  // }
 }
 
 
