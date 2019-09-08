@@ -1,4 +1,4 @@
-import { init, GameLoop, Sprite, track, SpriteSheet, initKeys, keyPressed, initPointer, pointer, onPointerUp, pointerPressed, pointerOver, load, TileEngine, dataAssets } from 'kontra';
+import { init, GameLoop, Sprite, track, SpriteSheet, initKeys, keyPressed, initPointer, pointer, onPointerUp, pointerPressed, pointerOver } from 'kontra';
 import { Jump } from './scripts/movement';
 import { Movement } from './scripts/movement';
 import { Collide } from './scripts/collision';
@@ -25,7 +25,7 @@ background.src = background_image;
   let gui = [];
   let objects = [];
 
-  let toggleHB = true;
+  let toggleHB = false;
 
   //P1 Spritesheet function
 
