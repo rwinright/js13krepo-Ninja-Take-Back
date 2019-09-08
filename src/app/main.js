@@ -288,7 +288,7 @@ background.src = background_image;
   const portal = new Item(200, 200, 30, 10, 'purple', false,
     function (player) {
       player.x = 30;
-      player.y = 185;
+      player.y = -Spawn.height;
       player.dx = 0;
     });
 
