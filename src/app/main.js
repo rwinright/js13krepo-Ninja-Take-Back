@@ -5,6 +5,7 @@ import { Collide } from './scripts/collision';
 import { Item } from './scripts/item';
 import p1_ss from './assets/player/P1_Walking.png';
 import background_image from './assets/level/js13k-map.png';
+import { playSound } from './assets/sfx/soundEffects';
 
 let player_sprite = new Image();
 player_sprite.src = p1_ss;
@@ -298,6 +299,7 @@ background.src = background_image;
         this.active = false;
         player.speed_base = 5;
       }
+      playSound([1,,0.3201,,0.4743,0.3202,,0.0833,,0.4207,0.4278,,,,,,,,1,,,,,0.5])
     }
   )
 
@@ -311,6 +313,7 @@ background.src = background_image;
         player.dx = -player.dx * 4;
         this.active = false;
       }
+      playSound([3,,0.3708,0.5822,0.3851,0.0584,,-0.0268,,,,-0.0749,0.7624,,,,,,1,,,,,0.5]) //Explosion sound
     }
   );
 
