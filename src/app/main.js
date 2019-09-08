@@ -1,14 +1,17 @@
-import { init, GameLoop, Sprite, track, SpriteSheet, initKeys, keyPressed, initPointer, pointer, onPointerUp, onPointerDown, pointerPressed, pointerOver } from 'kontra';
+import { init, GameLoop, Sprite, track, SpriteSheet, initKeys, keyPressed, initPointer, pointer, onPointerUp, pointerPressed, pointerOver, load, TileEngine, dataAssets } from 'kontra';
 import { Jump } from './scripts/movement';
 import { Movement } from './scripts/movement';
 import { Collide } from './scripts/collision';
 import { Item } from './scripts/item';
 import p1_ss from './assets/player/P1_Walking.png';
+import background_image from './assets/level/js13k-map.png';
 
 let player_sprite = new Image();
 player_sprite.src = p1_ss;
+let background = new Image();
+background.src = background_image;
 
-player_sprite.onload = function () {
+(player_sprite, background).onload = function () {
 
   let { canvas, context } = init();
 
@@ -21,6 +24,8 @@ player_sprite.onload = function () {
   let platforms = [];
   let gui = [];
   let objects = [];
+
+  let toggleHB = true;
 
   //P1 Spritesheet function
 
@@ -78,6 +83,16 @@ player_sprite.onload = function () {
 
   //Ground
 
+  //background
+
+  const Background = Sprite({
+    x: 0,
+    y: 0,
+    width: canvas.width,
+    height: canvas.height,
+    image: background
+  })
+
   const Ground = Sprite({
     x: 0,
     y: canvas.height - 10,
@@ -120,19 +135,19 @@ player_sprite.onload = function () {
 
   const Spawn = Sprite({ //Dynamically adjusts to be next to left wall
     x: Left_Wall.width,
-    y: canvas.height / 2,
-    height: 190,
-    width: 50,
+    y: (canvas.height / 2) - 8,
+    height: 216,
+    width: 52,
     color: 'black',
     slowPlayer: false,
     isClimbable: true
   })
 
   const End = Sprite({//Dynamically adjusts to be next to right wall
-    x: Right_Wall.x - 50,
-    y: canvas.height / 2,
-    height: 190,
-    width: 50,
+    x: Right_Wall.x - 52,
+    y: (canvas.height / 2) - 8,
+    height: 216,
+    width: 52,
     color: 'black',
     slowPlayer: false,
     hurtPlayer: false
@@ -151,9 +166,9 @@ player_sprite.onload = function () {
   const Platform = Sprite({
     x: Ground_Slow.width / 2,
     // y: (Spawn.y + End.y) / 2,
-    y: 100, // Set here for testing.
+    y: 100,
     height: 5,
-    width: Ground_Slow.width / 4, //Interesting use of the ground slow.
+    width: Ground_Slow.width / 4,
     color: 'brown',
     slowPlayer: false
   })
@@ -166,6 +181,18 @@ player_sprite.onload = function () {
     color: 'green',
     resetGame: () => {
       location.reload();
+    }
+  })
+
+  const Show_Hit_Boxes_Button = Sprite({
+    x: Reset_Button.x - 90,
+    y: 20,
+    height: 30,
+    width: 70,
+    color: 'red',
+    toggleHitboxes: () => {
+      toggleHB = !toggleHB
+      this.color = 'orange'
     }
   })
 
@@ -364,15 +391,24 @@ player_sprite.onload = function () {
       // }
 
 
-
+      //GUI Buttons
       Reset_Button.update();
+      Show_Hit_Boxes_Button.update();
       //Track pointer events on reset button
       track(Reset_Button);
+      track(Show_Hit_Boxes_Button);
       //You can guess what this does.
       if (pointerOver(Reset_Button) && pointerPressed("left")) {
         onPointerUp(() => {
           Reset_Button.color = "red"
           Reset_Button.resetGame();
+        })
+      }
+
+      if (pointerOver(Show_Hit_Boxes_Button) && pointerPressed("left")) {
+        onPointerUp(() => {
+          Show_Hit_Boxes_Button.color = "orange"
+          Show_Hit_Boxes_Button.toggleHitboxes();
         })
       }
 
@@ -397,15 +433,20 @@ player_sprite.onload = function () {
 
     render: function () { // render the game state
 
+      Background.render();
+      
       Player_1.render();
       Player_2.render();
-
+      
       //Test Item Rendering
       //Test_Item.render();
 
+      //Just comment this back in if you wanna generate the platform hitboxes
+      
       for (let i = 0; i < platforms.length; i++) {
-        platforms[i].render();
+          toggleHB ? platforms[i].render() : null;
       }
+
       for (let i = 0; i < objects.length; i++) {
         objects[i].render();
       }
@@ -414,8 +455,7 @@ player_sprite.onload = function () {
       }
 
       Reset_Button.render();
-
-      // Good-ass mouse tool
+      Show_Hit_Boxes_Button.render();
 
       //Text stuff!
       context.fillStyle = 'red'
@@ -427,7 +467,7 @@ player_sprite.onload = function () {
       context.fillStyle = 'white'
       context.font = '10px Courier New'
       context.fillText("RESET", Reset_Button.x + (Reset_Button.width / 2) - 12, Reset_Button.y + (Reset_Button.height / 2) + 2.5);
-
+      context.fillText("THBs", Show_Hit_Boxes_Button.x + (Show_Hit_Boxes_Button.width / 2) - 12, Show_Hit_Boxes_Button.y + (Show_Hit_Boxes_Button.height / 2) + 2.5);
     }
   });
 
