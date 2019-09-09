@@ -346,13 +346,19 @@ background.src = background_image;
 
   //Technically not an 'object' so I'll set this as an invisible hitbox over the gem.
   const end_flag = new Item(752.5, 175, 16, 16, '#ed64644a', true,
-    () => { console.log('NOTHING!!!'); });
+    (player) => {
+      if (!player.wins) {
+        alert(`${player.name} wins!!!`);
+        player.wins = true;
+      }
+      this.active = false;
+    });
 
   platforms.push(Ground, Ground_Slow, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform)
 
   gui.push(ItemBoxBottom, ItemBoxTop, ItemBoxLeft, ItemBoxRight, Divider);
 
-  objects.push(spring, portal, coffee, bomb, confuse, turret, bullet)
+  objects.push(spring, portal, coffee, bomb, confuse, turret, bullet, end_flag)
 
   //Text stuff!
   context.fillStyle = 'teal'
@@ -370,11 +376,13 @@ background.src = background_image;
       Player_1.update()
       Player_2.update()
       bullet.update()
-      end_flag.update();
       //Test Item Update
       //Test Item drag and drop
 
       for (let i = 0; i < objects.length; i++) {
+        //The last item should not move.
+        //Probably add another "isMovable" property to the objects?
+        if(!(objects[i] === objects[objects.length - 1]))
         track(objects[i])
         if (pointerOver(objects[i])) {
           if (pointerPressed('left')) {
@@ -387,10 +395,13 @@ background.src = background_image;
         }
 
         //Make sure objects never go past/beyond spawn/end.
-        if (objects[i].x <= 60) {
-          objects[i].x = objects[i].x + Spawn.width / 12
-        } else if ((objects[i].x + objects[i].width) >= 740) {
-          objects[i].x = 740 - End.width
+        //Unless the object is the end flag.
+        if(!(objects[i] === objects[objects.length - 1])){
+          if (objects[i].x <= 60) {
+            objects[i].x = objects[i].x + Spawn.width / 12
+          } else if ((objects[i].x + objects[i].width) >= 740) {
+            objects[i].x = 740 - End.width - (objects[i].width/2)
+          }
         }
 
         objects[i].update();
@@ -445,10 +456,6 @@ background.src = background_image;
       Player_1.render();
       Player_2.render();
 
-      //render the goal flag
-      end_flag.render();
-
-
       //Just comment this back in if you wanna generate the platform hitboxes
 
       for (let i = 0; i < platforms.length; i++) {
@@ -478,17 +485,6 @@ background.src = background_image;
       context.fillText("THBs", Show_Hit_Boxes_Button.x + (Show_Hit_Boxes_Button.width / 2) - 12, Show_Hit_Boxes_Button.y + (Show_Hit_Boxes_Button.height / 2) + 2.5);
     }
   });
-
-  function playerWin(player) {
-    if (player.collidesWith(end_flag)) {
-      if (!player.wins) {
-        alert(`${player.name} wins!!!`);
-        player.wins = true;
-      }
-      this.active = false;
-    }
-  }
-
 
   function applyGravity(player) {
     if (player.dy < player.max_fall_speed && !player.climbing && player.dy < 10) {
