@@ -186,6 +186,7 @@ background.src = background_image;
     }
   })
 
+  //Get rid of this before production
   const Show_Hit_Boxes_Button = Sprite({
     x: Reset_Button.x - 90,
     y: 20,
@@ -343,21 +344,16 @@ background.src = background_image;
     color: 'black'
   })
 
-  const end_flag = new Item(740, 150, 20, 40, 'red', true,
-
-    function (player) {
-      if (!player.wins) {
-        alert(`${player.name} wins!!!`);
-        player.wins = true;
-      }
-      this.active = false;
-    });
+  //Technically not an 'object' so I'll set this as an invisible hitbox over the gem.
+  const end_flag = new Item(752.5, 175, 16, 16, '#ed64644a', true,
+    () => { console.log('NOTHING!!!'); });
 
   platforms.push(Ground, Ground_Slow, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform)
 
   gui.push(ItemBoxBottom, ItemBoxTop, ItemBoxLeft, ItemBoxRight, Divider);
 
-  objects.push(spring, portal, coffee, bomb, confuse, turret, bullet, end_flag)
+  objects.push(spring, portal, coffee, bomb, confuse, turret, bullet)
+
   //Text stuff!
   context.fillStyle = 'teal'
   context.font = '10px Courier New'
@@ -374,6 +370,7 @@ background.src = background_image;
       Player_1.update()
       Player_2.update()
       bullet.update()
+      end_flag.update();
       //Test Item Update
       //Test Item drag and drop
 
@@ -390,12 +387,12 @@ background.src = background_image;
         }
 
         //Make sure objects never go past/beyond spawn/end.
-        if(objects[i].x <= 60){
+        if (objects[i].x <= 60) {
           objects[i].x = objects[i].x + Spawn.width / 12
-        } else if((objects[i].x + objects[i].width) >= 740){
+        } else if ((objects[i].x + objects[i].width) >= 740) {
           objects[i].x = 740 - End.width
         }
-        
+
         objects[i].update();
 
       }
@@ -448,8 +445,9 @@ background.src = background_image;
       Player_1.render();
       Player_2.render();
 
-      //Test Item Rendering
-      //Test_Item.render();
+      //render the goal flag
+      end_flag.render();
+
 
       //Just comment this back in if you wanna generate the platform hitboxes
 
@@ -480,6 +478,16 @@ background.src = background_image;
       context.fillText("THBs", Show_Hit_Boxes_Button.x + (Show_Hit_Boxes_Button.width / 2) - 12, Show_Hit_Boxes_Button.y + (Show_Hit_Boxes_Button.height / 2) + 2.5);
     }
   });
+
+  function playerWin(player) {
+    if (player.collidesWith(end_flag)) {
+      if (!player.wins) {
+        alert(`${player.name} wins!!!`);
+        player.wins = true;
+      }
+      this.active = false;
+    }
+  }
 
 
   function applyGravity(player) {
