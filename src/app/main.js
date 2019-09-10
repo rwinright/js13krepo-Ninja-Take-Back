@@ -239,7 +239,8 @@ background.src = background_image;
     max_fall_speed: 10,
     name: "billy",
     wins: false,
-    confused: false
+    confused: false,
+    explode: false
   });
 
   const ItemBoxBottom = Sprite({
