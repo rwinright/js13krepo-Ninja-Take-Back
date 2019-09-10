@@ -532,8 +532,6 @@ background.src = background_image;
         player.dy = 0;
       }
 
-
-
       //respawn if out of bounds
       if (player.x > canvas.width || player.y > canvas.height || player.x < 0 || player.y < 0) {
         player.x = 30;
