@@ -10,5 +10,6 @@ export class Item extends Sprite {
         this.effect = effect;
         this.active = true;
         this.pickup = pickup;
+        this.isMoveable = true;
     }
 }

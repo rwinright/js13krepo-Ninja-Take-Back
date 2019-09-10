@@ -6,6 +6,8 @@ import { Item } from './scripts/item';
 import p1_ss from './assets/player/P1_Walking.png';
 import background_image from './assets/level/js13k-map.png';
 import { playSound } from './assets/sfx/soundEffects';
+import { ClickNDrag } from './scripts/ClickNDrag';
+import { Gui } from './scripts/Gui';
 
 let player_sprite = new Image();
 player_sprite.src = p1_ss;
@@ -24,10 +26,11 @@ background.src = background_image;
   let gravity = .1;
 
   let platforms = [];
-  let gui = [];
+  let gui = Gui(canvas);
   let objects = [];
 
   let toggleHB = false;
+  let turntime = 0;
 
   //P1 Spritesheet function
 
@@ -138,7 +141,7 @@ background.src = background_image;
   const Spawn = Sprite({ //Dynamically adjusts to be next to left wall
     x: Left_Wall.width,
     y: (canvas.height / 2) - 8,
-    height: 216,
+    height: 200,
     width: 52,
     color: 'black',
     slowPlayer: false,
@@ -168,12 +171,61 @@ background.src = background_image;
   const Platform = Sprite({
     x: Ground_Slow.width / 2,
     // y: (Spawn.y + End.y) / 2,
-    y: 100,
+    y: 200,
     height: 5,
     width: Ground_Slow.width / 4,
-    color: 'brown',
+    color: 'red',
     slowPlayer: false
   })
+
+
+
+  //Items
+  const Player_1 = Sprite({
+    x: (Spawn.width + Left_Wall.width) - 20, // starting x,y position of the sprite based on spawn
+    y: Spawn.y - 40,
+    animations: P1_SpriteSheet.animations,
+    width: 30,
+    height: 30,
+    facing: 'right', // Check player facing
+    dx: 0,
+    dy: 0,
+    jumping: true,
+    grounded: false,
+    climbing: false,
+    speed: 3,
+    speed_base: 3,
+    max_fall_speed: 10,
+    name: 'Red',
+    wins: false,
+    confused: false,
+    explode: false,
+    objects: []
+
+  });
+
+  const Player_2 = Sprite({
+    x: (Spawn.width + Left_Wall.width) - 40,        // starting x,y position of the sprite based on spawn
+    y: Spawn.y - 80,
+    animations: P2_SpriteSheet.animations,
+    // color: 'blue',
+    width: 20,
+    height: 20,
+    facing: 'right',
+    dx: 0,
+    dy: 0,
+    jumping: true,
+    grounded: false,
+    speed: 3,
+    speed_base: 3,
+    max_fall_speed: 10,
+    name: "billy",
+    wins: false,
+    confused: false,
+    objects: []
+  });
+
+  let currentPlayer = Player_1;
 
   const Reset_Button = Sprite({
     x: 710,
@@ -199,103 +251,27 @@ background.src = background_image;
     }
   })
 
-  //Items
-  const Player_1 = Sprite({
-    x: (Spawn.width + Left_Wall.width) - 20, // starting x,y position of the sprite based on spawn
-    y: Spawn.y - 40,
-    animations: P1_SpriteSheet.animations,
-    width: 30,
+  const Swap_Turn_Button = Sprite({
+    x: Reset_Button.x - 180,
+    y: 20,
     height: 30,
-    facing: 'right', // Check player facing
-    dx: 0,
-    dy: 0,
-    jumping: true,
-    grounded: false,
-    climbing: false,
-    speed: 3,
-    speed_base: 3,
-    max_fall_speed: 10,
-    name: 'Red',
-    wins: false,
-    confused: false,
-    explode: false
-
-  });
-
-  const Player_2 = Sprite({
-    x: (Spawn.width + Left_Wall.width) - 40,        // starting x,y position of the sprite based on spawn
-    y: Spawn.y - 80,
-    animations: P2_SpriteSheet.animations,
-    // color: 'blue',
-    width: 20,
-    height: 20,
-    facing: 'right',
-    dx: 0,
-    dy: 0,
-    jumping: true,
-    grounded: false,
-    speed: 3,
-    speed_base: 3,
-    max_fall_speed: 10,
-    name: "billy",
-    wins: false,
-    confused: false
-  });
-
-  const ItemBoxBottom = Sprite({
-    x: 0,
-    y: 50,
-    height: 10,
-    width: canvas.width,
-    color: 'black'
+    width: 70,
+    color: 'green'
   })
-
-  const ItemBoxTop = Sprite({
-    x: 0,
-    y: 0,
-    width: canvas.width,
-    height: 10,
-    color: 'black'
-  })
-
-  const ItemBoxLeft = Sprite({
-    x: 0,
-    y: 0,
-    height: 50,
-    width: 15,
-    color: 'black'
-  })
-
-  const ItemBoxRight = Sprite({
-    height: 50,
-    width: 15,
-    x: canvas.width - 15,
-    y: 0,
-    color: 'black'
-  })
-
-  const Divider = Sprite({
-    height: 50,
-    width: 20,
-    x: canvas.width / 2,
-    y: 0,
-    color: 'black'
-  })
-
-  const spring = new Item(140, 300, 10, 100, 'gold', false,
+  const spring = new Item(140, 25, 10, 100, 'gold', false,
     function (player) {
       player.ddy = 0;
       player.dy = -9;
     });
 
-  const portal = new Item(200, 200, 30, 10, 'purple', false,
+  const portal = new Item(90, 30, 30, 10, 'purple', false,
     function (player) {
       player.x = 30;
       player.y = -Spawn.height;
       player.dx = 0;
     });
 
-  const coffee = new Item(200, 190, 10, 15, 'brown', true,
+  const coffee = new Item(60, 30, 10, 15, 'brown', true,
     function (player) {
       if (this.active) {
         this.active = false;
@@ -305,7 +281,7 @@ background.src = background_image;
     }
   )
 
-  const bomb = new Item(330, 360, 20, 20, 'dimgray', true,
+  const bomb = new Item(120, 30, 20, 20, 'dimgray', true,
     function (player) {
       player.explode = true;
       if (this.active) {
@@ -319,7 +295,7 @@ background.src = background_image;
     }
   );
 
-  const confuse = new Item(100, 100, 15, 10, 'pink', true,
+  const confuse = new Item(280, 25, 15, 10, 'pink', true,
     function (player) {
       if (this.active) {
         this.active = false;
@@ -328,13 +304,9 @@ background.src = background_image;
     }
   );
 
-  const turret = Sprite({
-    x: 400,
-    y: 350,
-    height: 30,
-    width: 20,
-    color: 'DarkSlateGrey'
-  })
+  // const turret = new Item(400, 350, 30, 20, 'DarkSlateGrey', false, function () {
+
+  // })
 
   const bullet = Sprite({
     x: -100,
@@ -353,12 +325,33 @@ background.src = background_image;
       }
       this.active = false;
     });
+  end_flag.isMoveable = false;
+  platforms.push(gui[1], Ground, Ground_Slow, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform)
 
-  platforms.push(Ground, Ground_Slow, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform)
+  objects.push(spring, portal, coffee, bomb, confuse)
 
-  gui.push(ItemBoxBottom, ItemBoxTop, ItemBoxLeft, ItemBoxRight, Divider);
+  for (let i = 0; i < 4; i++) {
+    let o1 = PickRandomObject();
+    o1.placer = Player_1;
+    o1.y = 25;
+    Player_1.objects[i] = o1;
 
-  objects.push(spring, portal, coffee, bomb, confuse, turret, bullet, end_flag)
+    let o2 = PickRandomObject();
+    o2.placer = Player_2;
+    o2.y = 25;
+    Player_2.objects[i] = o2;
+  }
+
+  for (let i = 0; i < Player_1.objects.length; i++) {
+    let o = Player_1.objects[i];
+    o.x = Player_1.objects[i].x + (i * 50);
+    console.log(o)
+  }
+
+  for (let i = 0; i < Player_2.objects.length; i++) {
+    let o = Player_2.objects[i];
+    o.x = canvas.width / 2 + (i * 50);
+  }
 
   //Text stuff!
   context.fillStyle = 'teal'
@@ -376,35 +369,38 @@ background.src = background_image;
       Player_1.update()
       Player_2.update()
       bullet.update()
-      //Test Item Update
-      //Test Item drag and drop
+
+      for (let i = 0; i < Player_1.objects.length; i++) {
+        Player_1.objects[i].update();
+        track(Player_1.objects[i]);
+        ClickNDrag(Player_1.objects[i], currentPlayer);
+
+      }
+      for (let i = 0; i < Player_2.objects.length; i++) {
+        Player_2.objects[i].update();
+        track(Player_2.objects[i]);
+        ClickNDrag(Player_2.objects[i], currentPlayer);
+      }
 
       for (let i = 0; i < objects.length; i++) {
         //The last item should not move.
         //Probably add another "isMovable" property to the objects?
-        if(!(objects[i] === objects[objects.length - 1]))
-        track(objects[i])
-        if (pointerOver(objects[i])) {
-          if (pointerPressed('left')) {
-            objects[i].x = pointer.x - objects[i].width / 2
-            objects[i].y = pointer.y - objects[i].height / 2
-          } else {
-            objects[i].x = objects[i].x
-            objects[i].y = objects[i].y
-          }
-        }
+        // if (objects[i].isMoveable) {
+        //   track(objects[i]);
+        //   ClickNDrag(objects[i], currentPlayer);
+        // }
 
         //Make sure objects never go past/beyond spawn/end.
         //Unless the object is the end flag.
-        if(!(objects[i] === objects[objects.length - 1])){
-          if (objects[i].x <= 60) {
+        if (!(objects[i] === objects[objects.length - 1])) {
+          if (objects[i].x <= 80) {
             objects[i].x = objects[i].x + Spawn.width / 12
           } else if ((objects[i].x + objects[i].width) >= 740) {
-            objects[i].x = 740 - End.width - (objects[i].width/2)
+            objects[i].x = 740 - End.width - (objects[i].width / 2)
           }
         }
 
-        objects[i].update();
+        //objects[i].update();
 
       }
 
@@ -415,6 +411,7 @@ background.src = background_image;
       //Track pointer events on reset button
       track(Reset_Button);
       track(Show_Hit_Boxes_Button);
+      track(Swap_Turn_Button);
       //You can guess what this does.
       if (pointerOver(Reset_Button) && pointerPressed("left")) {
         onPointerUp(() => {
@@ -428,6 +425,17 @@ background.src = background_image;
           Show_Hit_Boxes_Button.color = "orange"
           Show_Hit_Boxes_Button.toggleHitboxes();
         })
+      }
+
+      turntime++;
+
+      if (keyPressed('t') && turntime > 50) {
+        if (currentPlayer === Player_1) {
+          currentPlayer = Player_2;
+        } else if (currentPlayer === Player_2) {
+          currentPlayer = Player_1;
+        }
+        turntime = 0;
       }
 
       //Basically just keeps track of loop-time.
@@ -455,6 +463,7 @@ background.src = background_image;
 
       Player_1.render();
       Player_2.render();
+      end_flag.render();
 
       //Just comment this back in if you wanna generate the platform hitboxes
 
@@ -462,8 +471,19 @@ background.src = background_image;
         toggleHB ? platforms[i].render() : null;
       }
 
-      for (let i = 0; i < objects.length; i++) {
-        objects[i].render();
+      for (let i = 0; i < Player_1.objects.length; i++) {
+
+        let o1 = Player_1.objects[i];
+        if (o1.active) {
+          o1.render();
+        }
+      }
+      for (let i = 0; i < Player_2.objects.length; i++) {
+
+        let o2 = Player_2.objects[i];
+        if (o2.active) {
+          o2.render();
+        }
       }
       for (let i = 0; i < gui.length; i++) {
         gui[i].render();
@@ -482,6 +502,12 @@ background.src = background_image;
       context.fillStyle = 'white'
       context.font = '10px Courier New'
       context.fillText("RESET", Reset_Button.x + (Reset_Button.width / 2) - 12, Reset_Button.y + (Reset_Button.height / 2) + 2.5);
+      if (currentPlayer !== null) {
+        context.fillText(currentPlayer.name + " Turn", Swap_Turn_Button.x + (Swap_Turn_Button.width / 2) - 12, Swap_Turn_Button.y + (Swap_Turn_Button.height / 2) + 2.5);
+      }
+      else {
+        context.fillText("RACE TO THE FINISH!!", Swap_Turn_Button.x + (Swap_Turn_Button.width / 2) - 12, Swap_Turn_Button.y + (Swap_Turn_Button.height / 2) + 2.5);
+      }
       context.fillText("THBs", Show_Hit_Boxes_Button.x + (Show_Hit_Boxes_Button.width / 2) - 12, Show_Hit_Boxes_Button.y + (Show_Hit_Boxes_Button.height / 2) + 2.5);
     }
   });
@@ -492,8 +518,34 @@ background.src = background_image;
     }
   }
 
+  function PickRandomObject() {
+    let index = Math.floor(Math.random() * (objects.length - 1));
+    let o = objects[index];
+    let output = new Item(o.x, o.y, o.height, o.width, o.color, o.pick, o.effect);
+    return output;
+  }
+
+  function applyObjectCollision(player, inputs) {
+    for (let i = 0; i < inputs.length; i++) {
+      let o = inputs[i];
+      if (player.collidesWith(o)) {
+        o.effect(player);
+      }
+      if (!o.active) {
+        Player_1.objects = Player_1.objects.filter(function (c) {
+          return c != o;
+        })
+        Player_2.objects = Player_2.objects.filter(function (c) {
+          return c != o;
+        })
+      }
+    }
+  }
+
   function applyPlatformCollision(player) {
 
+    applyObjectCollision(player, Player_1.objects);
+    applyObjectCollision(player, Player_2.objects);
     for (let i = 0; i < platforms.length; i++) {
       let plat = platforms[i];
       platforms[i].update();
@@ -540,29 +592,19 @@ background.src = background_image;
       }
 
     }
-    for (let i = 0; i < objects.length; i++) {
-      let o = objects[i];
-      if (player.collidesWith(o)) {
-        o.effect(player);
-      }
-      if (!o.active) {
-        objects = objects.filter(function (c) {
-          return c != o;
-        })
-      }
-    }
 
-    if (player.collidesWith(turret)) {
-      bullet.x = turret.x - 5;
-      bullet.y = turret.y + 5;
-      bullet.ddx = -.5;
-      bullet.dx = -1;
-    }
 
-    if (player.collidesWith(bullet)) {
-      player.dx = -1;
-      player.dy = -1;
-    }
+    // if (player.collidesWith(turret)) {
+    //   bullet.x = turret.x - 5;
+    //   bullet.y = turret.y + 5;
+    //   bullet.ddx = -.5;
+    //   bullet.dx = -1;
+    // }
+
+    // if (player.collidesWith(bullet)) {
+    //   player.dx = -1;
+    //   player.dy = -1;
+    // }
   }
   loop.start();
 }
