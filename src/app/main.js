@@ -455,6 +455,8 @@ background.src = background_image;
 
       Player_1.render();
       Player_2.render();
+      turret.render();
+      bullet.render();
 
       //Just comment this back in if you wanna generate the platform hitboxes
 
@@ -529,8 +531,6 @@ background.src = background_image;
         player.dy = 0;
       }
 
-
-
       //respawn if out of bounds
       if (player.x > canvas.width || player.y > canvas.height || player.x < 0 || player.y < 0) {
         player.x = 30;
@@ -560,8 +560,9 @@ background.src = background_image;
     }
 
     if (player.collidesWith(bullet)) {
-      player.dx = -1;
+      player.dx = -6;
       player.dy = -1;
+      playSound([3, , 0.3708, 0.5822, 0.3851, 0.0584, , -0.0268, , , , -0.0749, 0.7624, , , , , , 1, , , , , 0.5]) //Explosion sound
     }
   }
   loop.start();
