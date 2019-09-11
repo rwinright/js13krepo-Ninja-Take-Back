@@ -1,17 +1,21 @@
-import { playSound }  from '../assets/sfx/soundEffects';
-
+import { playSound } from '../assets/sfx/soundEffects';
+import { Sprite } from 'kontra'
 export const Jump = (jumpPressed, player) => {
   if (jumpPressed) {
     if (!player.jumping && player.grounded) {
       player.jumping = true;
       player.grounded = false;
-      playSound([0,,0.1812,,0.1349,0.4524,,0.2365,,,,,,0.0819,,,,,1,,,,,0.5]);
+      playSound([0, , 0.1812, , 0.1349, 0.4524, , 0.2365, , , , , , 0.0819, , , , , 1, , , , , 0.5]);
       if (player.dy > -20) {
         player.dy -= 5;
       }
       //jump sound!
     }
   }
+}
+
+export const Shoot = (shootpressed, player) => {
+
 }
 
 
