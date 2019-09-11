@@ -117,7 +117,7 @@ background.src = background_image;
     height: canvas.height,
     image: background
   })
- 
+
   const Ground = Sprite({
     x: 0,
     y: canvas.height - 10,
@@ -281,7 +281,7 @@ background.src = background_image;
     width: 70,
     color: 'green'
   })
-  const spring = new Item(140, 25, 10, 100, 'orange', '', false,
+  const spring = new Item(140, 25, 10, 100, 'orange', bomb_image, false,
     function (player) {
       player.ddy = 0;
       player.dy = -9;
@@ -327,7 +327,7 @@ background.src = background_image;
     }
   );
 
-  const star = new Item(0, 0, 10, 10, 'gray', true,
+  const star = new Item(0, 0, 10, 10, 'gray', '', true,
     function (player) {
       if (this.active) {
         player.ammo += 5;
@@ -335,7 +335,7 @@ background.src = background_image;
       }
     })
 
-  const itemPlatform = new Item(100, 100, 5, 50, 'green', false,
+  const itemPlatform = new Item(100, 100, 5, 50, 'green', '', false,
     function (player) {
       let platformCol = Collide(player, this);
       if (platformCol !== null && player.explode) {
@@ -386,7 +386,7 @@ background.src = background_image;
     });
   end_flag.isMoveable = false;
 
-  const Gem1 = new Item(32, 180, 10, 10, 'green', true,
+  const Gem1 = new Item(32, 180, 10, 10, 'green', '', true,
     function (player) {
       if (player !== this.placer && this.active) {
         player.wins = true;
@@ -394,7 +394,7 @@ background.src = background_image;
       }
     })
 
-  const Gem2 = new Item(canvas.width - 32, 180, 10, 10, 'red', true,
+  const Gem2 = new Item(canvas.width - 32, 180, 10, 10, 'red', '', true,
     function (player) {
       if (player !== this.placer && this.active) {
         player.wins = true;
@@ -408,7 +408,6 @@ background.src = background_image;
   platforms.push(gui[1], Ground, Ground_Slow, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform)
 
   objects.push(spring, coffee, bomb, confuse, itemPlatform, star);
-
   for (let i = 0; i < 4; i++) {
     let o1 = PickRandomObject();
     o1.placer = Player_1;
@@ -574,7 +573,7 @@ background.src = background_image;
       //Turn timer
       context.fillStyle = 'white'
       context.font = '20px Courier New'
-      context.fillText(Math.floor(turntime/60), canvas.width/2 + 4, 35);
+      context.fillText(Math.floor(turntime / 60), canvas.width / 2 + 4, 35);
 
 
       //Text stuff!
@@ -596,7 +595,7 @@ background.src = background_image;
       context.fillText("THBs", Show_Hit_Boxes_Button.x + (Show_Hit_Boxes_Button.width / 2) - 12, Show_Hit_Boxes_Button.y + (Show_Hit_Boxes_Button.height / 2) + 2.5);
     }
 
-    
+
   });
 
   function applyGravity(player) {
@@ -608,7 +607,7 @@ background.src = background_image;
   function PickRandomObject() {
     let index = Math.floor(Math.random() * (objects.length));
     let o = objects[index];
-    let output = new Item(o.x, o.y, o.height, o.width, o.color, o.image, o.pick, o.effect);
+    let output = new Item(o.x, o.y, o.height, o.width, o.color, o.image, o.pickup, o.effect);
     return output;
   }
 

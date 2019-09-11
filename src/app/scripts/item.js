@@ -8,7 +8,9 @@ export class Item extends Sprite {
         this.height = height;
         this.color = color;
         this.effect = effect;
-        this.image = image;
+        if (image !== '') {
+            this.image = image;
+        }
         this.active = true;
         this.pickup = pickup;
         this.isMoveable = true;

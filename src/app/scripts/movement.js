@@ -1,5 +1,4 @@
 import { playSound } from '../assets/sfx/soundEffects';
-import { Sprite } from 'kontra'
 export const Jump = (jumpPressed, player) => {
   if (jumpPressed) {
     if (!player.jumping && player.grounded) {
