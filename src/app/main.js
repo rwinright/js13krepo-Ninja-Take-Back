@@ -281,7 +281,7 @@ background.src = background_image;
     width: 70,
     color: 'green'
   })
-  const spring = new Item(140, 25, 10, 100, 'orange', bomb_image, false,
+  const spring = new Item(140, 25, 10, 100, 'orange', '', false,
     function (player) {
       player.ddy = 0;
       player.dy = -9;
@@ -294,7 +294,7 @@ background.src = background_image;
   //     player.dx = 0;
   //   });
 
-  const coffee = new Item(60, 30, 25, 21, 'brown', coffee_sprite, true,
+  const coffee = new Item(60, 30, 20, 25, 'brown', coffee_sprite, true,
     function (player) {
       if (this.active) {
         this.active = false;
@@ -304,7 +304,7 @@ background.src = background_image;
     }
   )
 
-  const bomb = new Item(120, 30, 25, 21, '', bomb_sprite, true,
+  const bomb = new Item(120, 30, 25, 21, 'red', bomb_sprite, true,
     function (player) {
       player.explode = true;
       if (this.active) {
@@ -552,13 +552,18 @@ background.src = background_image;
       for (let i = 0; i < Player_1.objects.length; i++) {
 
         let o1 = Player_1.objects[i];
+        console.log(o1);
+
         if (o1.active) {
           o1.render();
         }
       }
+      console.log("------");
       for (let i = 0; i < Player_2.objects.length; i++) {
 
         let o2 = Player_2.objects[i];
+        console.log(o2);
+
         if (o2.active) {
           o2.render();
         }
@@ -670,6 +675,11 @@ background.src = background_image;
 
     applyObjectCollision(player, Player_1.objects);
     applyObjectCollision(player, Player_2.objects);
+    if (Player_1.wins && Player_1.x > 34) {
+      alert("Player 1 wins!!!");
+      location.reload();
+
+    }
     for (let i = 0; i < platforms.length; i++) {
       let plat = platforms[i];
       platforms[i].update();
