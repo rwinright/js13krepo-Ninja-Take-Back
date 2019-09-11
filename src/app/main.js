@@ -3,19 +3,39 @@ import { Jump } from './scripts/movement';
 import { Movement } from './scripts/movement';
 import { Collide } from './scripts/collision';
 import { Item } from './scripts/item';
+
 import p1_ss from './assets/player/P1_Walking.png';
+import p2_ss from './assets/player/P2_Walking.png';
+
+import bomb_image from './assets/items/bomb.png';
+import coffee_image from './assets/items/coffee.png';
+import confuse_image from './assets/items/confuse.png';
+
 import background_image from './assets/level/js13k-map.png';
 import { playSound } from './assets/sfx/soundEffects';
 import { ClickNDrag } from './scripts/ClickNDrag';
 import { Gui } from './scripts/Gui';
 
-let player_sprite = new Image();
-player_sprite.src = p1_ss;
+let player_1_sprite = new Image();
+player_1_sprite.src = p1_ss;
+
+let player_2_sprite = new Image();
+player_2_sprite.src = p2_ss;
+
+//items
+let bomb_sprite = new Image();
+bomb_sprite.src = bomb_image;
+
+let coffee_sprite = new Image();
+coffee_sprite.src = coffee_image;
+
+let confuse_sprite = new Image();
+confuse_sprite.src = confuse_image;
 
 let background = new Image();
 background.src = background_image;
 
-(player_sprite, background).onload = function () {
+(player_1_sprite, player_2_sprite, bomb_sprite, coffee_sprite, confuse_sprite, background).onload = function () {
 
   let { canvas, context } = init();
 
@@ -35,7 +55,7 @@ background.src = background_image;
   //P1 Spritesheet function
 
   let P1_SpriteSheet = SpriteSheet({
-    image: player_sprite,
+    image: player_1_sprite,
     frameWidth: 72,
     frameHeight: 72,
     animations: {
@@ -62,7 +82,7 @@ background.src = background_image;
   //P1 Spritesheet function
 
   let P2_SpriteSheet = SpriteSheet({
-    image: player_sprite,
+    image: player_2_sprite,
     frameWidth: 72,
     frameHeight: 72,
     animations: {
@@ -97,7 +117,7 @@ background.src = background_image;
     height: canvas.height,
     image: background
   })
-
+ 
   const Ground = Sprite({
     x: 0,
     y: canvas.height - 10,
@@ -185,8 +205,8 @@ background.src = background_image;
     x: (Spawn.width + Left_Wall.width) - 20, // starting x,y position of the sprite based on spawn
     y: Spawn.y - 40,
     animations: P1_SpriteSheet.animations,
-    width: 30,
-    height: 30,
+    width: 20,
+    height: 20,
     facing: 'right', // Check player facing
     dx: 0,
     dy: 0,
@@ -261,7 +281,7 @@ background.src = background_image;
     width: 70,
     color: 'green'
   })
-  const spring = new Item(140, 25, 10, 100, 'gold', false,
+  const spring = new Item(140, 25, 10, 100, 'orange', '', false,
     function (player) {
       player.ddy = 0;
       player.dy = -9;
@@ -274,7 +294,7 @@ background.src = background_image;
   //     player.dx = 0;
   //   });
 
-  const coffee = new Item(60, 30, 10, 15, 'brown', true,
+  const coffee = new Item(60, 30, 25, 21, 'brown', coffee_sprite, true,
     function (player) {
       if (this.active) {
         this.active = false;
@@ -284,7 +304,7 @@ background.src = background_image;
     }
   )
 
-  const bomb = new Item(120, 30, 20, 20, 'dimgray', true,
+  const bomb = new Item(120, 30, 25, 21, '', bomb_sprite, true,
     function (player) {
       player.explode = true;
       if (this.active) {
@@ -298,7 +318,7 @@ background.src = background_image;
     }
   );
 
-  const confuse = new Item(280, 25, 15, 10, 'pink', true,
+  const confuse = new Item(280, 25, 25, 21, 'pink', confuse_sprite, true,
     function (player) {
       if (this.active) {
         this.active = false;
@@ -356,7 +376,7 @@ background.src = background_image;
   // })
 
   //Technically not an 'object' so I'll set this as an invisible hitbox over the gem.
-  const end_flag = new Item(752.5, 175, 16, 16, '#ed64644a', true,
+  const end_flag = new Item(752.5, 175, 16, 16, '#ed64644a', '', true,
     (player) => {
       if (!player.wins) {
         alert(`${player.name} wins!!!`);
@@ -420,7 +440,6 @@ background.src = background_image;
 
   let loop = GameLoop({  // create the main game loop
     update: function () { // game logic goes here
-
       applyGravity(Player_1);
       applyGravity(Player_2);
 
@@ -551,6 +570,13 @@ background.src = background_image;
       Platform.render();
       Reset_Button.render();
 
+
+      //Turn timer
+      context.fillStyle = 'white'
+      context.font = '20px Courier New'
+      context.fillText(Math.floor(turntime/60), canvas.width/2 + 4, 35);
+
+
       //Text stuff!
       context.fillStyle = 'red'
       context.font = '12px Courier New'
@@ -569,6 +595,8 @@ background.src = background_image;
       }
       context.fillText("THBs", Show_Hit_Boxes_Button.x + (Show_Hit_Boxes_Button.width / 2) - 12, Show_Hit_Boxes_Button.y + (Show_Hit_Boxes_Button.height / 2) + 2.5);
     }
+
+    
   });
 
   function applyGravity(player) {
@@ -580,7 +608,7 @@ background.src = background_image;
   function PickRandomObject() {
     let index = Math.floor(Math.random() * (objects.length));
     let o = objects[index];
-    let output = new Item(o.x, o.y, o.height, o.width, o.color, o.pick, o.effect);
+    let output = new Item(o.x, o.y, o.height, o.width, o.color, o.image, o.pick, o.effect);
     return output;
   }
 
