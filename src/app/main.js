@@ -155,7 +155,7 @@ background.src = background_image;
     width: 52,
     color: 'black',
     slowPlayer: false,
-    hurtPlayer: false
+    isClimbable: true
   })
 
   const Ground_Slow = Sprite({ //Dynamically adjusts to be next to Ground and between the start/end
@@ -169,11 +169,11 @@ background.src = background_image;
   })
 
   const Platform = Sprite({
-    x: Ground_Slow.width / 2,
+    x: Ground_Slow.width / 2.5,
     // y: (Spawn.y + End.y) / 2,
-    y: 200,
+    y: 250,
     height: 5,
-    width: Ground_Slow.width / 4,
+    width: Ground_Slow.width / 3,
     color: 'red',
     slowPlayer: false
   })
@@ -193,19 +193,20 @@ background.src = background_image;
     jumping: true,
     grounded: false,
     climbing: false,
-    speed: 3,
-    speed_base: 3,
+    speed: 2.5,
+    speed_base: 2.5,
     max_fall_speed: 10,
     name: 'Red',
     wins: false,
     confused: false,
     explode: false,
-    objects: []
-
+    objects: [],
+    ammo: 100,
+    shootTime: 60
   });
 
   const Player_2 = Sprite({
-    x: (Spawn.width + Left_Wall.width) - 40,        // starting x,y position of the sprite based on spawn
+    x: canvas.width - 40,        // starting x,y position of the sprite based on spawn
     y: Spawn.y - 80,
     animations: P2_SpriteSheet.animations,
     // color: 'blue',
@@ -216,13 +217,15 @@ background.src = background_image;
     dy: 0,
     jumping: true,
     grounded: false,
-    speed: 3,
-    speed_base: 3,
+    speed: 2.5,
+    speed_base: 2.5,
     max_fall_speed: 10,
     name: "billy",
     wins: false,
     confused: false,
-    objects: []
+    objects: [],
+    ammo: 100,
+    shootTime: 60
   });
 
   let currentPlayer = Player_1;
@@ -264,18 +267,18 @@ background.src = background_image;
       player.dy = -9;
     });
 
-  const portal = new Item(90, 30, 30, 10, 'purple', false,
-    function (player) {
-      player.x = 30;
-      player.y = -Spawn.height;
-      player.dx = 0;
-    });
+  // const portal = new Item(90, 30, 30, 10, 'purple', false,
+  //   function (player) {
+  //     player.x = 30;
+  //     player.y = -Spawn.height;
+  //     player.dx = 0;
+  //   });
 
   const coffee = new Item(60, 30, 10, 15, 'brown', true,
     function (player) {
       if (this.active) {
         this.active = false;
-        player.speed_base = 5;
+        player.speed_base *= 1.1;
       }
       playSound([1, , 0.3201, , 0.4743, 0.3202, , 0.0833, , 0.4207, 0.4278, , , , , , , , 1, , , , , 0.5])
     }
@@ -288,7 +291,7 @@ background.src = background_image;
         player.ddy = 0;
         player.dy = -5;
         player.ddx = 0;
-        player.dx = -player.dx * 4;
+        player.dx = -player.dx * 1.5;
         this.active = false;
       }
       playSound([3, , 0.3708, 0.5822, 0.3851, 0.0584, , -0.0268, , , , -0.0749, 0.7624, , , , , , 1, , , , , 0.5]) //Explosion sound
@@ -304,17 +307,53 @@ background.src = background_image;
     }
   );
 
+  const star = new Item(0, 0, 10, 10, 'gray', true,
+    function (player) {
+      if (this.active) {
+        player.ammo += 5;
+        this.active = false;
+      }
+    })
+
+  const itemPlatform = new Item(100, 100, 5, 50, 'green', false,
+    function (player) {
+      let platformCol = Collide(player, this);
+      if (platformCol !== null && player.explode) {
+        player.explode = false;
+      }
+      if (platformCol === "l" || platformCol === "r") {
+        player.dx = 0;
+        if (plat.isClimbable) {
+          player.dy = -10;
+
+        }
+      }
+      else if (platformCol === "b") {
+        player.dy = 0;
+        player.ddy = 0;
+        player.jumping = false;
+        player.grounded = true;
+        // platforms[i].slowPlayer ? player.speed = 1.3 : player.speed = 3
+        player.climbing = false;
+        player.speed = player.speed_base;
+      }
+      else if (platformCol === "t") {
+        player.dy = 0;
+        player.climbing = false;
+      }
+    })
+
   // const turret = new Item(400, 350, 30, 20, 'DarkSlateGrey', false, function () {
 
   // })
 
-  const bullet = Sprite({
-    x: -100,
-    y: -100,
-    height: 5,
-    width: 10,
-    color: 'black'
-  })
+  // const bullet = Sprite({
+  //   x: -100,
+  //   y: -100,
+  //   height: 5,
+  //   width: 10,
+  //   color: 'black'
+  // })
 
   //Technically not an 'object' so I'll set this as an invisible hitbox over the gem.
   const end_flag = new Item(752.5, 175, 16, 16, '#ed64644a', true,
@@ -326,9 +365,29 @@ background.src = background_image;
       this.active = false;
     });
   end_flag.isMoveable = false;
+
+  const Gem1 = new Item(32, 180, 10, 10, 'green', true,
+    function (player) {
+      if (player !== this.placer && this.active) {
+        player.wins = true;
+        this.active = false;
+      }
+    })
+
+  const Gem2 = new Item(canvas.width - 32, 180, 10, 10, 'red', true,
+    function (player) {
+      if (player !== this.placer && this.active) {
+        player.wins = true;
+        this.active = false;
+      }
+    })
+
+  Gem1.placer = Player_1;
+  Gem2.placer = Player_2;
+
   platforms.push(gui[1], Ground, Ground_Slow, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform)
 
-  objects.push(spring, portal, coffee, bomb, confuse)
+  objects.push(spring, coffee, bomb, confuse, itemPlatform, star);
 
   for (let i = 0; i < 4; i++) {
     let o1 = PickRandomObject();
@@ -345,13 +404,15 @@ background.src = background_image;
   for (let i = 0; i < Player_1.objects.length; i++) {
     let o = Player_1.objects[i];
     o.x = Player_1.objects[i].x + (i * 50);
-    console.log(o)
   }
 
   for (let i = 0; i < Player_2.objects.length; i++) {
     let o = Player_2.objects[i];
-    o.x = canvas.width / 2 + (i * 50);
+    o.x = canvas.width / 2 + 100 + (i * 50);
   }
+
+  Player_1.objects.push(Gem1);
+  Player_2.objects.push(Gem2);
 
   //Text stuff!
   context.fillStyle = 'teal'
@@ -368,49 +429,37 @@ background.src = background_image;
 
       Player_1.update()
       Player_2.update()
-      bullet.update()
 
       for (let i = 0; i < Player_1.objects.length; i++) {
         Player_1.objects[i].update();
         track(Player_1.objects[i]);
         ClickNDrag(Player_1.objects[i], currentPlayer);
+        ClearStart(Player_1.objects[i]);
 
       }
       for (let i = 0; i < Player_2.objects.length; i++) {
         Player_2.objects[i].update();
         track(Player_2.objects[i]);
         ClickNDrag(Player_2.objects[i], currentPlayer);
+        ClearStart(Player_2.objects[i]);
       }
 
       for (let i = 0; i < objects.length; i++) {
         //The last item should not move.
-        //Probably add another "isMovable" property to the objects?
-        // if (objects[i].isMoveable) {
-        //   track(objects[i]);
-        //   ClickNDrag(objects[i], currentPlayer);
-        // }
-
         //Make sure objects never go past/beyond spawn/end.
         //Unless the object is the end flag.
-        if (!(objects[i] === objects[objects.length - 1])) {
-          if (objects[i].x <= 80) {
-            objects[i].x = objects[i].x + Spawn.width / 12
-          } else if ((objects[i].x + objects[i].width) >= 740) {
-            objects[i].x = 740 - End.width - (objects[i].width / 2)
-          }
-        }
 
-        //objects[i].update();
+
 
       }
 
 
       //GUI Buttons
       Reset_Button.update();
-      Show_Hit_Boxes_Button.update();
+      // Show_Hit_Boxes_Button.update();
       //Track pointer events on reset button
       track(Reset_Button);
-      track(Show_Hit_Boxes_Button);
+      // track(Show_Hit_Boxes_Button);
       track(Swap_Turn_Button);
       //You can guess what this does.
       if (pointerOver(Reset_Button) && pointerPressed("left")) {
@@ -446,7 +495,15 @@ background.src = background_image;
 
       Movement({ left: keyPressed('a'), right: keyPressed('d') }, Player_1);
       Movement({ left: keyPressed('left'), right: keyPressed('right') }, Player_2);
+      if (Player_1.shootTime > 60) {
+        Shoot(keyPressed('e'), Player_1);
+      }
 
+      if (Player_2.shootTime > 60) {
+        Shoot(keyPressed('space'), Player_2);
+      }
+      Player_1.shootTime++;
+      Player_2.shootTime++;
       if (Player_1.collidesWith(Player_2)) {
         Player_1.x = Player_1.x + 1;
       }
@@ -473,6 +530,7 @@ background.src = background_image;
         toggleHB ? platforms[i].render() : null;
       }
 
+
       for (let i = 0; i < Player_1.objects.length; i++) {
 
         let o1 = Player_1.objects[i];
@@ -490,9 +548,8 @@ background.src = background_image;
       for (let i = 0; i < gui.length; i++) {
         gui[i].render();
       }
-
+      Platform.render();
       Reset_Button.render();
-      Show_Hit_Boxes_Button.render();
 
       //Text stuff!
       context.fillStyle = 'red'
@@ -521,7 +578,7 @@ background.src = background_image;
   }
 
   function PickRandomObject() {
-    let index = Math.floor(Math.random() * (objects.length - 1));
+    let index = Math.floor(Math.random() * (objects.length));
     let o = objects[index];
     let output = new Item(o.x, o.y, o.height, o.width, o.color, o.pick, o.effect);
     return output;
@@ -540,6 +597,44 @@ background.src = background_image;
         Player_2.objects = Player_2.objects.filter(function (c) {
           return c != o;
         })
+      }
+    }
+  }
+
+  function ClearStart(object) {
+    if (object.isBullet) {
+
+    }
+    else if (object.x <= 80) {
+      object.x = object.x + Spawn.width / 12
+    } else if ((object.x + object.width) >= 740) {
+      object.x = 740 - End.width - (object.width / 2)
+    }
+  }
+
+  function Shoot(shootpressed, player) {
+    if (shootpressed) {
+      if (player.ammo > 0) {
+        player.ammo--;
+        player.shootTime = 0;
+        let bullet = new Item(player.x + player.width / 1.5, player.y + player.height / 2, 10, 10, 'red', false,
+          function (player) {
+            if (player !== bullet.placer) {
+              player.wins = false;
+            }
+          });
+
+        bullet.placer = player;
+        if (player.facing === 'right') {
+          bullet.dx = 10;
+        }
+        else {
+          bullet.dx = -10;
+        }
+        bullet.isBullet = true;
+        player.objects.push(bullet);
+        console.log(bullet.dx);
+        objects.push(bullet);
       }
     }
   }
@@ -581,6 +676,7 @@ background.src = background_image;
       if (slowCol === "b") {
         player.speed = player.speed_base / 2;
         player.dy = 0;
+        player.explode
       }
 
       //respawn if out of bounds
@@ -594,7 +690,6 @@ background.src = background_image;
     }
 
 
-<<<<<<< HEAD
     // if (player.collidesWith(turret)) {
     //   bullet.x = turret.x - 5;
     //   bullet.y = turret.y + 5;
@@ -606,13 +701,7 @@ background.src = background_image;
     //   player.dx = -1;
     //   player.dy = -1;
     // }
-=======
-    if (player.collidesWith(bullet)) {
-      player.dx = -6;
-      player.dy = -1;
-      playSound([3, , 0.3708, 0.5822, 0.3851, 0.0584, , -0.0268, , , , -0.0749, 0.7624, , , , , , 1, , , , , 0.5]) //Explosion sound
-    }
->>>>>>> 139428a31d91d1bf7abe365602dc0cb8c2f0f15f
+
   }
   loop.start();
 }
