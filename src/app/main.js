@@ -16,8 +16,6 @@ import { playSound } from './assets/sfx/soundEffects';
 import { ClickNDrag } from './scripts/ClickNDrag';
 import { Gui } from './scripts/Gui';
 
-let currentTime = 0;
-
 let player_1_sprite = new Image();
 player_1_sprite.src = p1_ss;
 
@@ -383,8 +381,6 @@ background.src = background_image;
       applyGravity(Player_1);
       applyGravity(Player_2);
 
-      currentTime++
-
       applyPlatformCollision(Player_1);
       applyPlatformCollision(Player_2);
 
@@ -520,7 +516,7 @@ background.src = background_image;
       //Turn timer
       context.fillStyle = 'white'
       context.font = '20px Courier New'
-      context.fillText(Math.floor(currentTime/60), canvas.width/2 + 4, 35);
+      context.fillText(Math.floor(turntime/60), canvas.width/2 + 4, 35);
 
 
       //Text stuff!
