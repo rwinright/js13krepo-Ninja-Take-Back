@@ -383,6 +383,8 @@ background.src = background_image;
       applyGravity(Player_1);
       applyGravity(Player_2);
 
+      currentTime++
+
       applyPlatformCollision(Player_1);
       applyPlatformCollision(Player_2);
 
@@ -514,6 +516,13 @@ background.src = background_image;
       Reset_Button.render();
       Show_Hit_Boxes_Button.render();
 
+
+      //Turn timer
+      context.fillStyle = 'white'
+      context.font = '20px Courier New'
+      context.fillText(Math.floor(currentTime/60), canvas.width/2 + 4, 35);
+
+
       //Text stuff!
       context.fillStyle = 'red'
       context.font = '12px Courier New'
@@ -532,6 +541,8 @@ background.src = background_image;
       }
       context.fillText("THBs", Show_Hit_Boxes_Button.x + (Show_Hit_Boxes_Button.width / 2) - 12, Show_Hit_Boxes_Button.y + (Show_Hit_Boxes_Button.height / 2) + 2.5);
     }
+
+    
   });
 
   function applyGravity(player) {
