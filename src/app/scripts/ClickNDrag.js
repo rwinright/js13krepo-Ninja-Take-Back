@@ -6,8 +6,7 @@ export const ClickNDrag = (object, currentPlayer) => {
             object.y = pointer.y - object.height / 2
         }
         else {
-            // objects[i].x = objects[i].x
-            // objects[i].y = objects[i].y
+
         }
     }
 }

@@ -49,8 +49,16 @@ export const Gui = (canvas) => {
         color: 'black'
     })
 
+    const StartButton = Sprite({
+        x: 350,
+        y: 350,
+        height: 30,
+        width: 70,
+        color: 'green'
+    })
 
 
-    gui.push(ItemBG, ItemBoxBottom, ItemBoxTop, ItemBoxLeft, ItemBoxRight, Divider);
+
+    gui.push(ItemBG, ItemBoxBottom, ItemBoxTop, ItemBoxLeft, ItemBoxRight, Divider, StartButton);
     return gui;
 }

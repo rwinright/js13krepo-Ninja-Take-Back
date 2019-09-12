@@ -293,6 +293,8 @@ extra_ammo.src = extra_ammo_image;
     width: 70,
     color: 'green'
   })
+
+
   const spring = new Item(140, 25, 10, 100, 'orange', '', false,
     function (player) {
       player.ddy = 0;
@@ -321,8 +323,9 @@ extra_ammo.src = extra_ammo_image;
       if (this.active) {
         player.wins = false;
         player.explode = true;
+        player.y -= 5;
         player.ddy = 0;
-        player.dy = -5;
+        player.dy = -6;
         player.ddx = 0;
         player.dx = -player.dx * 1.5;
         this.active = false;
@@ -370,6 +373,7 @@ extra_ammo.src = extra_ammo_image;
         // platforms[i].slowPlayer ? player.speed = 1.3 : player.speed = 3
         player.climbing = false;
         player.speed = player.speed_base;
+        player.slowed = false;
       }
       else if (platformCol === "t") {
         player.dy = 0;
@@ -514,14 +518,18 @@ extra_ammo.src = extra_ammo_image;
       for (let i = 0; i < Player_1.objects.length; i++) {
         Player_1.objects[i].update();
         track(Player_1.objects[i]);
-        ClickNDrag(Player_1.objects[i], currentPlayer);
+        if (!started) {
+          ClickNDrag(Player_1.objects[i], currentPlayer);
+        }
         ClearStart(Player_1.objects[i]);
       }
 
       for (let i = 0; i < Player_2.objects.length; i++) {
         Player_2.objects[i].update();
         track(Player_2.objects[i]);
-        ClickNDrag(Player_2.objects[i], currentPlayer);
+        if (!started) {
+          ClickNDrag(Player_2.objects[i], currentPlayer);
+        }
         ClearStart(Player_2.objects[i]);
       }
 
@@ -540,7 +548,9 @@ extra_ammo.src = extra_ammo_image;
       // Show_Hit_Boxes_Button.update();
       //Track pointer events on reset button
       track(Reset_Button);
-      // track(Show_Hit_Boxes_Button);
+      if (!started) {
+        track(gui[6]);
+      }
       track(Swap_Turn_Button);
       //You can guess what this does.
       if (pointerOver(Reset_Button) && pointerPressed("left")) {
@@ -549,12 +559,15 @@ extra_ammo.src = extra_ammo_image;
           Reset_Button.resetGame();
         })
       }
-
-      if (pointerOver(Show_Hit_Boxes_Button) && pointerPressed("left")) {
-        onPointerUp(() => {
-          Show_Hit_Boxes_Button.color = "orange"
-          Show_Hit_Boxes_Button.toggleHitboxes();
-        })
+      if (!started) {
+        if (pointerOver(gui[6]) && pointerPressed("left")) {
+          onPointerUp(() => {
+            started = true;
+            gui = gui.filter(function (c) {
+              return c != gui[6];
+            })
+          })
+        }
       }
 
       turntime++;
@@ -571,18 +584,19 @@ extra_ammo.src = extra_ammo_image;
 
       //Basically just keeps track of loop-time.
       timer++;
+      if (started) {
+        Jump(keyPressed('w'), Player_1, timer);
+        Jump(keyPressed('up'), Player_2, timer);
 
-      Jump(keyPressed('w'), Player_1, timer);
-      Jump(keyPressed('up'), Player_2, timer);
+        Movement({ left: keyPressed('a'), right: keyPressed('d') }, Player_1);
+        Movement({ left: keyPressed('left'), right: keyPressed('right') }, Player_2);
+        if (Player_1.shootTime > 60) {
+          Shoot(keyPressed('e'), Player_1);
+        }
 
-      Movement({ left: keyPressed('a'), right: keyPressed('d') }, Player_1);
-      Movement({ left: keyPressed('left'), right: keyPressed('right') }, Player_2);
-      if (Player_1.shootTime > 60) {
-        Shoot(keyPressed('e'), Player_1);
-      }
-
-      if (Player_2.shootTime > 60) {
-        Shoot(keyPressed('space'), Player_2);
+        if (Player_2.shootTime > 60) {
+          Shoot(keyPressed('space'), Player_2);
+        }
       }
       Player_1.shootTime++;
       Player_2.shootTime++;
@@ -661,13 +675,16 @@ extra_ammo.src = extra_ammo_image;
       context.fillStyle = 'white'
       context.font = '10px Courier New'
       context.fillText("RESET", Reset_Button.x + (Reset_Button.width / 2) - 12, Reset_Button.y + (Reset_Button.height / 2) + 2.5);
-      if (currentPlayer !== null) {
+      if (!started) {
         context.fillText(currentPlayer.name + " Turn", Swap_Turn_Button.x + (Swap_Turn_Button.width / 2) - 12, Swap_Turn_Button.y + (Swap_Turn_Button.height / 2) + 2.5);
       }
       else {
-        context.fillText("RACE TO THE FINISH!!", Swap_Turn_Button.x + (Swap_Turn_Button.width / 2) - 12, Swap_Turn_Button.y + (Swap_Turn_Button.height / 2) + 2.5);
+        context.fillText("STEAL THEM GEMS!!", Swap_Turn_Button.x + (Swap_Turn_Button.width / 2) - 12, Swap_Turn_Button.y + (Swap_Turn_Button.height / 2) + 2.5);
       }
-      context.fillText("THBs", Show_Hit_Boxes_Button.x + (Show_Hit_Boxes_Button.width / 2) - 12, Show_Hit_Boxes_Button.y + (Show_Hit_Boxes_Button.height / 2) + 2.5);
+      if (!started) {
+        let button = gui[6];
+        context.fillText("START", button.x + (button.width / 2) - 12, button.y + (button.height / 2) + 2.5)
+      }
     }
 
 
@@ -796,9 +813,7 @@ extra_ammo.src = extra_ammo_image;
       platforms[i].update();
 
       let platformCol = Collide(player, platforms[i]);
-      if (platformCol !== null && player.explode) {
-        player.explode = false;
-      }
+
 
       if (platformCol === "l" || platformCol === "r") {
         player.dx = 0;
@@ -835,6 +850,10 @@ extra_ammo.src = extra_ammo_image;
         player.y = 170;
         player.dx = 0;
         player.ddy = 0;
+      }
+
+      if (platformCol !== null && player.explode) {
+        player.explode = false;
       }
 
     }
