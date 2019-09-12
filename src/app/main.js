@@ -8,7 +8,8 @@ import p1_ss from './assets/player/P1_Walking.png';
 import p2_ss from './assets/player/P2_Walking.png';
 
 import bomb_image from './assets/items/bomb.png';
-import star_image from './assets/items/shuriken.png'
+import star_image from './assets/items/shuriken.png';
+import extra_ammo_image from './assets/items/extra-ammo.png';
 import coffee_image from './assets/items/coffee.png';
 import confuse_image from './assets/items/confuse.png';
 
@@ -38,6 +39,9 @@ background.src = background_image;
 
 let star_sprite = new Image();
 star_sprite.src = star_image;
+
+let extra_ammo = new Image();
+extra_ammo.src = extra_ammo_image;
 
 (player_1_sprite, player_2_sprite, bomb_sprite, coffee_sprite, confuse_sprite, background).onload = function () {
 
@@ -332,7 +336,7 @@ star_sprite.src = star_image;
     }
   );
 
-  const star = new Item(0, 0, 10, 10, 'gray', star_sprite, true,
+  const star = new Item(0, 0, 30, 30, 'gray', extra_ammo, true,
     function (player) {
       if (this.active) {
         player.ammo += 5;
