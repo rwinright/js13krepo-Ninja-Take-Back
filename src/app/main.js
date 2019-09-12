@@ -18,6 +18,8 @@ import { playSound } from './assets/sfx/soundEffects';
 import { ClickNDrag } from './scripts/ClickNDrag';
 import { Gui } from './scripts/Gui';
 
+let started = false;
+
 let player_1_sprite = new Image();
 player_1_sprite.src = p1_ss;
 
@@ -316,14 +318,16 @@ extra_ammo.src = extra_ammo_image;
 
   const bomb = new Item(120, 30, 25, 25, 'red', bomb_sprite, true,
     function (player) {
-      player.explode = true;
       if (this.active) {
+        player.wins = false;
+        player.explode = true;
         player.ddy = 0;
         player.dy = -5;
         player.ddx = 0;
         player.dx = -player.dx * 1.5;
         this.active = false;
         playSound([3, , 0.3708, 0.5822, 0.3851, 0.0584, , -0.0268, , , , -0.0749, 0.7624, , , , , , 1, , , , , 0.5]) //Explosion sound
+        TurnOnGem(player);
       }
     }
   );
@@ -554,14 +558,15 @@ extra_ammo.src = extra_ammo_image;
       }
 
       turntime++;
-
-      if (keyPressed('t') && Math.floor(turntime / 60) > 20) {
-        if (currentPlayer === Player_1) {
-          currentPlayer = Player_2;
-        } else if (currentPlayer === Player_2) {
-          currentPlayer = Player_1;
+      if (!started) {
+        if (keyPressed('t') && Math.floor(turntime / 60) > 20) {
+          if (currentPlayer === Player_1) {
+            currentPlayer = Player_2;
+          } else if (currentPlayer === Player_2) {
+            currentPlayer = Player_1;
+          }
+          turntime = 0;
         }
-        turntime = 0;
       }
 
       //Basically just keeps track of loop-time.
@@ -847,6 +852,15 @@ extra_ammo.src = extra_ammo_image;
     //   player.dy = -1;
     // }
 
+  }
+
+  function TurnOnGem(player) {
+    if (player === Player_1) {
+      Gem2.active = true;
+    }
+    else if (player === Player_2) {
+      Gem1.active = true;
+    }
   }
   loop.start();
 }
