@@ -6,7 +6,12 @@ export const Jump = (jumpPressed, player) => {
       player.grounded = false;
       playSound([0, , 0.1812, , 0.1349, 0.4524, , 0.2365, , , , , , 0.0819, , , , , 1, , , , , 0.5]);
       if (player.dy > -20) {
-        player.dy -= 5;
+        if (player.slowed) {
+          player.dy -= 3;
+        } else {
+          player.dy -= 5;
+
+        }
       }
       //jump sound!
     }
@@ -25,7 +30,7 @@ export const Movement = (keyPress, player) => {
   }
   else if (keyPress.right) {
     // right arrow
-    player.facing = 'right'
+    player.facing = 'right';
     if (player.confused) {
       player.dx = -player.speed;
     }

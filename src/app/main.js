@@ -56,6 +56,7 @@ extra_ammo.src = extra_ammo_image;
   let platforms = [];
   let gui = Gui(canvas);
   let objects = [];
+  let neutralItems = [];
 
   let toggleHB = false;
   let turntime = 0;
@@ -229,7 +230,7 @@ extra_ammo.src = extra_ammo_image;
     confused: false,
     explode: false,
     objects: [],
-    ammo: 100,
+    ammo: 0,
     shootTime: 60
   });
 
@@ -253,7 +254,7 @@ extra_ammo.src = extra_ammo_image;
     confused: false,
     explode: false,
     objects: [],
-    ammo: 100,
+    ammo: 0,
     shootTime: 60
   });
 
@@ -322,8 +323,8 @@ extra_ammo.src = extra_ammo_image;
         player.ddx = 0;
         player.dx = -player.dx * 1.5;
         this.active = false;
+        playSound([3, , 0.3708, 0.5822, 0.3851, 0.0584, , -0.0268, , , , -0.0749, 0.7624, , , , , , 1, , , , , 0.5]) //Explosion sound
       }
-      playSound([3, , 0.3708, 0.5822, 0.3851, 0.0584, , -0.0268, , , , -0.0749, 0.7624, , , , , , 1, , , , , 0.5]) //Explosion sound
     }
   );
 
@@ -339,7 +340,7 @@ extra_ammo.src = extra_ammo_image;
   const star = new Item(0, 0, 30, 30, 'gray', extra_ammo, true,
     function (player) {
       if (this.active) {
-        player.ammo += 5;
+        player.ammo += 1000;
         this.active = false;
       }
     })
@@ -354,6 +355,35 @@ extra_ammo.src = extra_ammo_image;
         player.dx = 0;
         if (plat.isClimbable) {
           player.dy = -10;
+
+        }
+      }
+      else if (platformCol === "b") {
+        player.dy = 0;
+        player.ddy = 0;
+        player.jumping = false;
+        player.grounded = true;
+        // platforms[i].slowPlayer ? player.speed = 1.3 : player.speed = 3
+        player.climbing = false;
+        player.speed = player.speed_base;
+      }
+      else if (platformCol === "t") {
+        player.dy = 0;
+        player.climbing = false;
+      }
+    })
+
+  const itemWall = new Item(100, 100, 40, 5, 'green', '', false,
+    function (player) {
+      this.isClimbable = true;
+      let platformCol = Collide(player, this);
+      if (platformCol !== null && player.explode) {
+        player.explode = false;
+      }
+      if (platformCol === "l" || platformCol === "r") {
+        player.dx = 0;
+        if (plat.isClimbable) {
+          player.dy = -5;
 
         }
       }
@@ -395,7 +425,7 @@ extra_ammo.src = extra_ammo_image;
     });
   end_flag.isMoveable = false;
 
-  const Gem1 = new Item(32, 180, 10, 10, 'green', '', true,
+  const Gem1 = new Item(32, 180, 10, 10, 'green', '', false,
     function (player) {
       if (player !== this.placer && this.active) {
         player.wins = true;
@@ -413,10 +443,28 @@ extra_ammo.src = extra_ammo_image;
 
   Gem1.placer = Player_1;
   Gem2.placer = Player_2;
+  Gem1.active = true;
+  Gem2.active = true;
+
+  const bomb1 = CopyObject(bomb);
+  bomb1.x = 335
+  bomb1.y = 220;
+
+  const bomb2 = CopyObject(bomb);
+  bomb2.x = 410;
+  bomb2.y = 220;
+
+  const neutralStar = CopyObject(star);
+  neutralStar.x = 370;
+  neutralStar.y = 220;
+
+  const neutralStar2 = CopyObject(star);
+  neutralStar2.x = 370;
+  neutralStar2.y = 350;
 
   platforms.push(gui[1], Ground, Ground_Slow, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform)
-
-  objects.push(spring, coffee, bomb, confuse, itemPlatform, star);
+  neutralItems.push(bomb1, bomb2, neutralStar, neutralStar2);
+  objects.push(spring, coffee, bomb, confuse, itemPlatform, itemWall, star);
   for (let i = 0; i < 4; i++) {
     let o1 = PickRandomObject();
     o1.placer = Player_1;
@@ -439,8 +487,8 @@ extra_ammo.src = extra_ammo_image;
     o.x = canvas.width / 2 + 100 + (i * 50);
   }
 
-  Player_1.objects.push(Gem1);
-  Player_2.objects.push(Gem2);
+  // Player_1.objects.push(Gem1);
+  // Player_2.objects.push(Gem2);
 
   //Text stuff!
   context.fillStyle = 'teal'
@@ -454,8 +502,10 @@ extra_ammo.src = extra_ammo_image;
       applyPlatformCollision(Player_1);
       applyPlatformCollision(Player_2);
 
-      Player_1.update()
-      Player_2.update()
+      Player_1.update();
+      Player_2.update();
+      Gem1.update();
+      Gem2.update();
 
       for (let i = 0; i < Player_1.objects.length; i++) {
         Player_1.objects[i].update();
@@ -548,8 +598,12 @@ extra_ammo.src = extra_ammo_image;
       Player_1.render();
       Player_2.render();
       end_flag.render();
-      // turret.render();
-      // bullet.render();
+      if (Gem1.active) {
+        Gem1.render();
+      }
+      if (Gem2.active) {
+        Gem2.render();
+      }
 
       //Just comment this back in if you wanna generate the platform hitboxes
 
@@ -571,6 +625,13 @@ extra_ammo.src = extra_ammo_image;
         // console.log(o2);
         if (o2.active) {
           o2.render();
+        }
+      }
+
+      for (let i = 0; i < neutralItems.length; i++) {
+        let o = neutralItems[i];
+        if (o.active) {
+          o.render();
         }
       }
       for (let i = 0; i < gui.length; i++) {
@@ -620,19 +681,32 @@ extra_ammo.src = extra_ammo_image;
     return output;
   }
 
+  function CopyObject(o) {
+    let output = new Item(o.x, o.y, o.height, o.width, o.color, o.image, o.pickup, o.effect);
+    return output;
+  }
+
   function applyObjectCollision(player, inputs) {
-    for (let i = 0; i < inputs.length; i++) {
-      let o = inputs[i];
+    if (inputs === Gem1 || inputs === Gem2) {
+      let o = inputs;
       if (player.collidesWith(o)) {
         o.effect(player);
       }
-      if (!o.active) {
-        Player_1.objects = Player_1.objects.filter(function (c) {
-          return c != o;
-        })
-        Player_2.objects = Player_2.objects.filter(function (c) {
-          return c != o;
-        })
+    }
+    else {
+      for (let i = 0; i < inputs.length; i++) {
+        let o = inputs[i];
+        if (player.collidesWith(o)) {
+          o.effect(player);
+        }
+        if (!o.active && o !== Gem1 && o !== Gem2) {
+          Player_1.objects = Player_1.objects.filter(function (c) {
+            return c != o;
+          })
+          Player_2.objects = Player_2.objects.filter(function (c) {
+            return c != o;
+          })
+        }
       }
     }
   }
@@ -654,21 +728,30 @@ extra_ammo.src = extra_ammo_image;
         player.ammo--;
         player.shootTime = 0;
 
-        let bullet = new Item(player.x + player.width / 1.5, player.y + player.height / 2, 10, 10, 'red', star_sprite, false,
+        let bullet = new Item(player.x + player.width / 1.5, player.y + player.height / 2, 10, 10, 'red', star_sprite, true,
           function (player) {
             if (player !== bullet.placer && bullet.collidesWith(player)) {
               player.wins = false;
               if (player === Player_1) {
-                Gem1.active = true;
-              }
-              else if (player === Player_2) {
                 Gem2.active = true;
               }
+              else if (player === Player_2) {
+                Gem1.active = true;
+              }
 
 
-              bullet.color = 'transparent'
-              player.dy = -1.3;
-              player.dx = -player.dx * 3;
+              bullet.color = 'transparent';
+              player.dy = -1.5;
+              player.explode = true;
+              player.dx = bullet.dx * .3;
+              // if (bullet.x > 0) {
+
+              // }
+              // else {
+
+              // }
+
+              //player.dx = -player.dx * 5;
             }
           });
 
@@ -691,6 +774,9 @@ extra_ammo.src = extra_ammo_image;
 
     applyObjectCollision(player, Player_1.objects);
     applyObjectCollision(player, Player_2.objects);
+    applyObjectCollision(player, neutralItems);
+    applyObjectCollision(player, Gem1);
+    applyObjectCollision(player, Gem2);
     if (Player_1.wins && Player_1.x < 34) {
       alert("Player 1 wins!!!");
       location.reload();
@@ -708,6 +794,7 @@ extra_ammo.src = extra_ammo_image;
       if (platformCol !== null && player.explode) {
         player.explode = false;
       }
+
       if (platformCol === "l" || platformCol === "r") {
         player.dx = 0;
         if (plat.isClimbable) {
@@ -720,21 +807,22 @@ extra_ammo.src = extra_ammo_image;
         player.ddy = 0;
         player.jumping = false;
         player.grounded = true;
-        platforms[i].slowPlayer ? player.speed = 1.3 : player.speed = 3
+        //platforms[i].slowPlayer ? player.speed = 1.3 : player.speed = 3
         player.climbing = false;
-        player.speed = player.speed_base;
+        if (platforms[i] === Ground_Slow) {
+          player.speed = player.speed_base / 2;
+          player.slowed = true;
+        }
+        else {
+          player.speed = player.speed_base;
+          player.slowed = false;
+        }
       }
       else if (platformCol === "t") {
         player.dy = 0;
         player.climbing = false;
       }
-      let slowCol = Collide(player, Ground_Slow);
 
-      if (slowCol === "b") {
-        player.speed = player.speed_base / 2;
-        player.dy = 0;
-        player.explode
-      }
 
       //respawn if out of bounds
       if (player.x > canvas.width || player.y > canvas.height || player.x < 0 || player.y < 0) {
