@@ -243,7 +243,7 @@ extra_ammo.src = extra_ammo_image;
     // color: 'blue',
     width: 20,
     height: 20,
-    facing: 'right',
+    facing: 'left',
     dx: 0,
     dy: 0,
     jumping: true,
