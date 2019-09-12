@@ -8,6 +8,8 @@ import p1_ss from './assets/player/P1_Walking.png';
 import p2_ss from './assets/player/P2_Walking.png';
 
 import bomb_image from './assets/items/bomb.png';
+import star_image from './assets/items/shuriken.png';
+import extra_ammo_image from './assets/items/extra-ammo.png';
 import coffee_image from './assets/items/coffee.png';
 import confuse_image from './assets/items/confuse.png';
 
@@ -34,6 +36,12 @@ confuse_sprite.src = confuse_image;
 
 let background = new Image();
 background.src = background_image;
+
+let star_sprite = new Image();
+star_sprite.src = star_image;
+
+let extra_ammo = new Image();
+extra_ammo.src = extra_ammo_image;
 
 (player_1_sprite, player_2_sprite, bomb_sprite, coffee_sprite, confuse_sprite, background).onload = function () {
 
@@ -243,6 +251,7 @@ background.src = background_image;
     name: "billy",
     wins: false,
     confused: false,
+    explode: false,
     objects: [],
     ammo: 100,
     shootTime: 60
@@ -294,7 +303,7 @@ background.src = background_image;
   //     player.dx = 0;
   //   });
 
-  const coffee = new Item(60, 30, 20, 25, 'brown', coffee_sprite, true,
+  const coffee = new Item(60, 30, 25, 21, 'brown', coffee_sprite, true,
     function (player) {
       if (this.active) {
         this.active = false;
@@ -304,7 +313,7 @@ background.src = background_image;
     }
   )
 
-  const bomb = new Item(120, 30, 25, 21, 'red', bomb_sprite, true,
+  const bomb = new Item(120, 30, 25, 25, 'red', bomb_sprite, true,
     function (player) {
       player.explode = true;
       if (this.active) {
@@ -327,7 +336,7 @@ background.src = background_image;
     }
   );
 
-  const star = new Item(0, 0, 10, 10, 'gray', '', true,
+  const star = new Item(0, 0, 30, 30, 'gray', extra_ammo, true,
     function (player) {
       if (this.active) {
         player.ammo += 5;
@@ -453,8 +462,8 @@ background.src = background_image;
         track(Player_1.objects[i]);
         ClickNDrag(Player_1.objects[i], currentPlayer);
         ClearStart(Player_1.objects[i]);
-
       }
+      
       for (let i = 0; i < Player_2.objects.length; i++) {
         Player_2.objects[i].update();
         track(Player_2.objects[i]);
@@ -496,7 +505,7 @@ background.src = background_image;
 
       turntime++;
 
-      if (keyPressed('t') && turntime > 50) {
+      if (keyPressed('t') && Math.floor(turntime/60) > 20) {
         if (currentPlayer === Player_1) {
           currentPlayer = Player_2;
         } else if (currentPlayer === Player_2) {
@@ -552,18 +561,14 @@ background.src = background_image;
       for (let i = 0; i < Player_1.objects.length; i++) {
 
         let o1 = Player_1.objects[i];
-        console.log(o1);
-
         if (o1.active) {
           o1.render();
         }
       }
-      console.log("------");
       for (let i = 0; i < Player_2.objects.length; i++) {
 
         let o2 = Player_2.objects[i];
-        console.log(o2);
-
+        // console.log(o2);
         if (o2.active) {
           o2.render();
         }
@@ -573,7 +578,6 @@ background.src = background_image;
       }
       Platform.render();
       Reset_Button.render();
-
 
       //Turn timer
       context.fillStyle = 'white'
@@ -627,7 +631,7 @@ background.src = background_image;
           return c != o;
         })
         Player_2.objects = Player_2.objects.filter(function (c) {
-          return c != o;
+          return c != o; 
         })
       }
     }
@@ -649,14 +653,18 @@ background.src = background_image;
       if (player.ammo > 0) {
         player.ammo--;
         player.shootTime = 0;
-        let bullet = new Item(player.x + player.width / 1.5, player.y + player.height / 2, 10, 10, 'red', false,
+        let bullet = new Item(player.x + player.width / 1.5, player.y + player.height / 2, 10, 10, 'red', star_sprite, false,
           function (player) {
-            if (player !== bullet.placer) {
+            if (player !== bullet.placer && bullet.collidesWith(player)) {
               player.wins = false;
+              bullet.color = 'transparent'
+              player.dy = -1.3;
+              player.dx = -player.dx * 3;
             }
           });
 
         bullet.placer = player;
+        
         if (player.facing === 'right') {
           bullet.dx = 10;
         }
@@ -665,7 +673,6 @@ background.src = background_image;
         }
         bullet.isBullet = true;
         player.objects.push(bullet);
-        console.log(bullet.dx);
         objects.push(bullet);
       }
     }
