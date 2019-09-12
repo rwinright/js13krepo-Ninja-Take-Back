@@ -552,18 +552,14 @@ background.src = background_image;
       for (let i = 0; i < Player_1.objects.length; i++) {
 
         let o1 = Player_1.objects[i];
-        console.log(o1);
-
         if (o1.active) {
           o1.render();
         }
       }
-      console.log("------");
       for (let i = 0; i < Player_2.objects.length; i++) {
 
         let o2 = Player_2.objects[i];
-        console.log(o2);
-
+        // console.log(o2);
         if (o2.active) {
           o2.render();
         }
@@ -573,7 +569,6 @@ background.src = background_image;
       }
       Platform.render();
       Reset_Button.render();
-
 
       //Turn timer
       context.fillStyle = 'white'
@@ -627,7 +622,7 @@ background.src = background_image;
           return c != o;
         })
         Player_2.objects = Player_2.objects.filter(function (c) {
-          return c != o;
+          return c != o; 
         })
       }
     }
@@ -649,14 +644,20 @@ background.src = background_image;
       if (player.ammo > 0) {
         player.ammo--;
         player.shootTime = 0;
-        let bullet = new Item(player.x + player.width / 1.5, player.y + player.height / 2, 10, 10, 'red', false,
+        let bullet = new Item(player.x + player.width / 1.5, player.y + player.height / 2, 10, 10, 'red', '', false,
           function (player) {
-            if (player !== bullet.placer) {
+            if (player !== bullet.placer && bullet.collidesWith(player)) {
               player.wins = false;
+              console.log(`${player.name} was hit`);
+              console.log(bullet);
+              bullet.color = 'transparent'
+              player.dy = -1.3;
+              player.dx = -player.dx * 3;
             }
           });
 
         bullet.placer = player;
+        
         if (player.facing === 'right') {
           bullet.dx = 10;
         }
@@ -665,7 +666,6 @@ background.src = background_image;
         }
         bullet.isBullet = true;
         player.objects.push(bullet);
-        console.log(bullet.dx);
         objects.push(bullet);
       }
     }
