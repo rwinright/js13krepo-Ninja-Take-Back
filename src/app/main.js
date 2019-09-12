@@ -649,10 +649,17 @@ background.src = background_image;
       if (player.ammo > 0) {
         player.ammo--;
         player.shootTime = 0;
-        let bullet = new Item(player.x + player.width / 1.5, player.y + player.height / 2, 10, 10, 'red', false,
+        let bullet = new Item(player.x + player.width / 1.5, player.y + player.height / 2, 10, 10, 'red', '', false,
           function (player) {
             if (player !== bullet.placer) {
               player.wins = false;
+              if (player === Player_1) {
+                Gem1.active = true;
+              }
+              else if (player === Player_2) {
+                Gem2.active = true;
+              }
+
             }
           });
 
@@ -675,10 +682,14 @@ background.src = background_image;
 
     applyObjectCollision(player, Player_1.objects);
     applyObjectCollision(player, Player_2.objects);
-    if (Player_1.wins && Player_1.x > 34) {
+    if (Player_1.wins && Player_1.x < 34) {
       alert("Player 1 wins!!!");
       location.reload();
+    }
 
+    if (Player_2.wins && Player_2.x > 745) {
+      alert("Player 2 wins!!!");
+      location.reload();
     }
     for (let i = 0; i < platforms.length; i++) {
       let plat = platforms[i];
