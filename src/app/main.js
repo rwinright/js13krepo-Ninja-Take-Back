@@ -554,7 +554,7 @@ player_2_gem.src = player_2_gem_image;
 
       turntime++;
 
-      if (keyPressed('t') && turntime > 20) {
+      if (keyPressed('t') && turntime/60 > 10) {
         if (currentPlayer === Player_1) {
           currentPlayer = Player_2;
         } else if (currentPlayer === Player_2) {
