@@ -67,6 +67,8 @@ player_2_gem.src = player_2_gem_image;
   let objects = [];
   let neutralItems = [];
 
+  let respawnStar = 0;
+
   let toggleHB = false;
   let turntime = 0;
 
@@ -502,6 +504,16 @@ player_2_gem.src = player_2_gem_image;
       Player_2.update();
       Gem1.update();
       Gem2.update();
+
+      if (!neutralStar.active) {
+        respawnStar++;
+        if (respawnStar > 600) {
+          neutralStar.active = true;
+          respawnStar = 0;
+          neutralItems.push(neutralStar);
+        }
+      }
+
       for (let i = 0; i < Player_1.objects.length; i++) {
         Player_1.objects[i].update();
         track(Player_1.objects[i]);
