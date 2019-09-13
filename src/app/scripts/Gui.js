@@ -50,8 +50,8 @@ export const Gui = (canvas) => {
     })
 
     const StartButton = Sprite({
-        x: 350,
-        y: 350,
+        x: 375,
+        y: 50,
         height: 30,
         width: 70,
         color: 'green'
