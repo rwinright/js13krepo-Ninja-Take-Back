@@ -80,6 +80,9 @@ player_2_gem.src = player_2_gem_image;
   let objects = [];
   let neutralItems = [];
 
+  let respawnStar = 0;
+
+  let toggleHB = false;
   let turntime = 0;
 
   //P1 Spritesheet function
@@ -251,7 +254,8 @@ player_2_gem.src = player_2_gem_image;
     explode: false,
     objects: [],
     ammo: 0,
-    shootTime: 60
+    shootTime: 60,
+    confuseTime: 0
   });
 
   const Player_2 = Sprite({
@@ -275,7 +279,8 @@ player_2_gem.src = player_2_gem_image;
     explode: false,
     objects: [],
     ammo: 0,
-    shootTime: 60
+    shootTime: 60,
+    confuseTime: 0
   });
 
   let currentPlayer = Player_1;
@@ -310,9 +315,9 @@ player_2_gem.src = player_2_gem_image;
     function (player) {
       if (this.active) {
         this.active = false;
-        player.speed_base *= 1.1;
+        player.speed_base *= 1.20;
+        playSound([1, , 0.3201, , 0.4743, 0.3202, , 0.0833, , 0.4207, 0.4278, , , , , , , , 1, , , , , 0.5])
       }
-      playSound([1, , 0.3201, , 0.4743, 0.3202, , 0.0833, , 0.4207, 0.4278, , , , , , , , 1, , , , , 0.5])
     }
   )
 
@@ -323,7 +328,7 @@ player_2_gem.src = player_2_gem_image;
         player.explode = true;
         player.y -= 5;
         player.ddy = 0;
-        player.dy = -6;
+        player.dy = -4;
         player.ddx = 0;
         player.dx = -player.dx * 1.5;
         this.active = false;
@@ -336,6 +341,7 @@ player_2_gem.src = player_2_gem_image;
   const confuse = new Item(280, 25, 25, 21, 'pink', confuse_sprite, true,
     function (player) {
       if (this.active) {
+        player.confuseTime = 0;
         this.active = false;
         player.speed_base = -player.speed_base;
       }
@@ -345,7 +351,7 @@ player_2_gem.src = player_2_gem_image;
   const star = new Item(0, 0, 30, 30, 'gray', extra_ammo, true,
     function (player) {
       if (this.active) {
-        player.ammo += 1000;
+        player.ammo += 5;
         this.active = false;
       }
     })
@@ -443,13 +449,13 @@ player_2_gem.src = player_2_gem_image;
   neutralStar.x = 370;
   neutralStar.y = 220;
 
-  const neutralStar2 = CopyObject(star);
-  neutralStar2.x = 370;
-  neutralStar2.y = 350;
+  const neutralCoffee = CopyObject(coffee);
+  neutralCoffee.x = 370;
+  neutralCoffee.y = 350;
 
   platforms.push(gui[1], Ground, Ground_Slow, Left_Wall, Right_Wall, Top_Wall, Spawn, End, Platform)
-  neutralItems.push(bomb1, bomb2, neutralStar, neutralStar2);
-  objects.push(spring, coffee, bomb, confuse, itemPlatform, itemWall, star);
+  neutralItems.push(bomb1, bomb2, neutralStar, neutralCoffee);
+  objects.push(spring, bomb, confuse, itemPlatform, itemWall);
   for (let i = 0; i < 4; i++) {
     let o1 = PickRandomObject();
     o1.placer = Player_1;
@@ -491,6 +497,15 @@ player_2_gem.src = player_2_gem_image;
       Player_2.update();
       Gem1.update();
       Gem2.update();
+
+      if (!neutralStar.active) {
+        respawnStar++;
+        if (respawnStar > 600) {
+          neutralStar.active = true;
+          respawnStar = 0;
+          neutralItems.push(neutralStar);
+        }
+      }
 
       for (let i = 0; i < Player_1.objects.length; i++) {
         Player_1.objects[i].update();
@@ -538,16 +553,16 @@ player_2_gem.src = player_2_gem_image;
       }
 
       turntime++;
-      if (!started) {
-        if (keyPressed('t') && Math.floor(turntime / 60) > 20) {
-          if (currentPlayer === Player_1) {
-            currentPlayer = Player_2;
-          } else if (currentPlayer === Player_2) {
-            currentPlayer = Player_1;
-          }
-          turntime = 0;
+
+      if (keyPressed('t') && turntime > 20) {
+        if (currentPlayer === Player_1) {
+          currentPlayer = Player_2;
+        } else if (currentPlayer === Player_2) {
+          currentPlayer = Player_1;
         }
+        turntime = 0;
       }
+
 
       //Basically just keeps track of loop-time.
       timer++;
@@ -680,6 +695,16 @@ player_2_gem.src = player_2_gem_image;
     }
   }
 
+  function ProcessConfuse(player) {
+    if (player.confused) {
+      player.confuseTime++;
+    }
+
+    if (player.confuseTime > 100) {
+      player.confused = false;
+    }
+  }
+
   function ClearStart(object) {
     if (object.isBullet) {
 
@@ -746,12 +771,12 @@ player_2_gem.src = player_2_gem_image;
     applyObjectCollision(player, neutralItems);
     applyObjectCollision(player, Gem1);
     applyObjectCollision(player, Gem2);
-    if (Player_1.wins && Player_1.x < 34) {
+    if (Player_1.wins && Player_1.x < 34 && !Player_2.wins) {
       alert("Player 1 wins!!!");
       location.reload();
     }
 
-    if (Player_2.wins && Player_2.x > 745) {
+    if (Player_2.wins && Player_2.x > 745 && !Player_1.wins) {
       alert("Player 2 wins!!!");
       location.reload();
     }
