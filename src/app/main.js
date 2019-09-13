@@ -367,10 +367,6 @@ player_2_gem.src = player_2_gem_image;
       }
       if (platformCol === "l" || platformCol === "r") {
         player.dx = 0;
-        if (plat.isClimbable) {
-          player.dy = -10;
-
-        }
       }
       else if (platformCol === "b") {
         player.dy = 0;
