@@ -7,7 +7,17 @@
 </head>
 
 <body>
-  <canvas height="400" width="800" id='game'></canvas>
+  <script>
+    //Disable arrow key scrolling
+    window.addEventListener("keydown", function (e) {
+      // space and arrow keys
+      if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+        e.preventDefault();
+      }
+    }, false);
+
+  </script>
+
   <div class="help">
     <h3>Who will be the first to steal the other Ninja's gem?</h3>
     <hr>
@@ -16,6 +26,9 @@
     <p>Each side corresponds to the items the player may place on his turn.</p>
     <p>Once your items are placed, press start to play!</p>
     <hr>
+
+    <canvas height="400" width="800" id='game'></canvas>
+
     <p>ITEMS:</p>
     <p>We'll leave the strategic parts up to you. 😜</p>
     <p>Coffee: The brown potion - gives the player a boost in speed</p>
