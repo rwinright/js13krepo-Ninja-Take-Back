@@ -244,7 +244,7 @@ player_2_gem.src = player_2_gem_image;
   });
 
   const Player_2 = Sprite({
-    x: canvas.width - 40,        // starting x,y position of the sprite based on spawn
+    x: 739,        // starting x,y position of the sprite based on spawn
     y: Spawn.y - 80,
     animations: P2_SpriteSheet.animations,
     // color: 'blue',
@@ -439,7 +439,7 @@ player_2_gem.src = player_2_gem_image;
       }
     })
 
-  const Gem2 = new Item(canvas.width - 32, 175, 13, 13, 'red', player_2_gem, true,
+  const Gem2 = new Item(canvas.width - 42, 175, 13, 13, 'red', player_2_gem, true,
     function (player) {
       if (player !== this.placer && this.active) {
         player.wins = true;
