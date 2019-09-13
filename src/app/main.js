@@ -12,6 +12,8 @@ import star_image from './assets/items/shuriken.png';
 import extra_ammo_image from './assets/items/extra-ammo.png';
 import coffee_image from './assets/items/coffee.png';
 import confuse_image from './assets/items/confuse.png';
+import player_1_gem_image from './assets/items/player_1_gem.png';
+import player_2_gem_image from './assets/items/player_2_gem.png';
 
 import background_image from './assets/level/js13k-map.png';
 import { playSound } from './assets/sfx/soundEffects';
@@ -44,6 +46,11 @@ star_sprite.src = star_image;
 
 let extra_ammo = new Image();
 extra_ammo.src = extra_ammo_image;
+
+let player_1_gem = new Image();
+player_1_gem.src = player_1_gem_image;
+let player_2_gem = new Image();
+player_2_gem.src = player_2_gem_image;
 
 (player_1_sprite, player_2_sprite, bomb_sprite, coffee_sprite, confuse_sprite, background).onload = function () {
 
@@ -400,7 +407,6 @@ extra_ammo.src = extra_ammo_image;
         player.ddy = 0;
         player.jumping = false;
         player.grounded = true;
-        // platforms[i].slowPlayer ? player.speed = 1.3 : player.speed = 3
         player.climbing = false;
         player.speed = player.speed_base;
       }
@@ -433,7 +439,7 @@ extra_ammo.src = extra_ammo_image;
     });
   end_flag.isMoveable = false;
 
-  const Gem1 = new Item(32, 180, 10, 10, 'green', '', false,
+  const Gem1 = new Item(32, 175, 13, 13, 'green', player_1_gem, false,
     function (player) {
       if (player !== this.placer && this.active) {
         player.wins = true;
@@ -441,7 +447,7 @@ extra_ammo.src = extra_ammo_image;
       }
     })
 
-  const Gem2 = new Item(canvas.width - 32, 180, 10, 10, 'red', '', true,
+  const Gem2 = new Item(canvas.width - 32, 175, 13, 13, 'red', player_2_gem, true,
     function (player) {
       if (player !== this.placer && this.active) {
         player.wins = true;
