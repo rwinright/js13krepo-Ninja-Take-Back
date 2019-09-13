@@ -14,6 +14,10 @@ import coffee_image from './assets/items/coffee.png';
 import confuse_image from './assets/items/confuse.png';
 import player_1_gem_image from './assets/items/player_1_gem.png';
 import player_2_gem_image from './assets/items/player_2_gem.png';
+import item_platform_image from './assets/items/item_platform.png';
+import item_wall_image from './assets/items/item_wall.png';
+
+import middle_platform_image from './assets/level/middle_platform.png';
 
 import background_image from './assets/level/js13k-map.png';
 import { playSound } from './assets/sfx/soundEffects';
@@ -46,6 +50,15 @@ star_sprite.src = star_image;
 
 let extra_ammo = new Image();
 extra_ammo.src = extra_ammo_image;
+
+const item_platform = new Image();
+item_platform.src = item_platform_image;
+
+let middle_platform = new Image();
+middle_platform.src = middle_platform_image;
+
+let item_wall = new Image();
+item_wall.src = item_wall_image;
 
 let player_1_gem = new Image();
 player_1_gem.src = player_1_gem_image;
@@ -212,13 +225,12 @@ player_2_gem.src = player_2_gem_image;
     x: Ground_Slow.width / 2.5,
     // y: (Spawn.y + End.y) / 2,
     y: 250,
-    height: 5,
+    height: 16,
     width: Ground_Slow.width / 3,
     color: 'red',
+    image: middle_platform,
     slowPlayer: false
   })
-
-
 
   //Items
   const Player_1 = Sprite({
@@ -299,13 +311,6 @@ player_2_gem.src = player_2_gem_image;
       player.dy = -9;
     });
 
-  // const portal = new Item(90, 30, 30, 10, 'purple', false,
-  //   function (player) {
-  //     player.x = 30;
-  //     player.y = -Spawn.height;
-  //     player.dx = 0;
-  //   });
-
   const coffee = new Item(60, 30, 25, 21, 'brown', coffee_sprite, true,
     function (player) {
       if (this.active) {
@@ -351,7 +356,7 @@ player_2_gem.src = player_2_gem_image;
       }
     })
 
-  const itemPlatform = new Item(100, 100, 5, 50, 'green', '', false,
+  const itemPlatform = new Item(100, 100, 8, 40, 'green', item_platform, false,
     function (player) {
       let platformCol = Collide(player, this);
       if (platformCol !== null && player.explode) {
@@ -376,7 +381,7 @@ player_2_gem.src = player_2_gem_image;
       }
     })
 
-  const itemWall = new Item(100, 100, 40, 5, 'green', '', false,
+  const itemWall = new Item(100, 100, 40, 8, 'green', item_wall, false,
     function (player) {
       this.isClimbable = true;
       let platformCol = Collide(player, this);
@@ -399,18 +404,6 @@ player_2_gem.src = player_2_gem_image;
         player.climbing = false;
       }
     })
-
-  // const turret = new Item(400, 350, 30, 20, 'DarkSlateGrey', false, function () {
-
-  // })
-
-  // const bullet = Sprite({
-  //   x: -100,
-  //   y: -100,
-  //   height: 5,
-  //   width: 10,
-  //   color: 'black'
-  // })
 
   //Technically not an 'object' so I'll set this as an invisible hitbox over the gem.
   const end_flag = new Item(752.5, 175, 16, 16, '#ed64644a', '', true,
@@ -532,16 +525,6 @@ player_2_gem.src = player_2_gem_image;
         ClearStart(Player_2.objects[i]);
       }
 
-      for (let i = 0; i < objects.length; i++) {
-        //The last item should not move.
-        //Make sure objects never go past/beyond spawn/end.
-        //Unless the object is the end flag.
-
-
-
-      }
-
-
       //GUI Buttons
       Reset_Button.update();
       // Show_Hit_Boxes_Button.update();
@@ -571,7 +554,7 @@ player_2_gem.src = player_2_gem_image;
 
       turntime++;
 
-      if (keyPressed('t') && turntime > 20) {
+      if (keyPressed('t') && turntime/60 > 10) {
         if (currentPlayer === Player_1) {
           currentPlayer = Player_2;
         } else if (currentPlayer === Player_2) {
@@ -623,13 +606,6 @@ player_2_gem.src = player_2_gem_image;
         Gem2.render();
       }
 
-      //Just comment this back in if you wanna generate the platform hitboxes
-
-      for (let i = 0; i < platforms.length; i++) {
-        toggleHB ? platforms[i].render() : null;
-      }
-
-
       for (let i = 0; i < Player_1.objects.length; i++) {
 
         let o1 = Player_1.objects[i];
@@ -640,7 +616,6 @@ player_2_gem.src = player_2_gem_image;
       for (let i = 0; i < Player_2.objects.length; i++) {
 
         let o2 = Player_2.objects[i];
-        // console.log(o2);
         if (o2.active) {
           o2.render();
         }
@@ -657,18 +632,6 @@ player_2_gem.src = player_2_gem_image;
       }
       Platform.render();
       Reset_Button.render();
-
-      //Turn timer
-      context.fillStyle = 'white'
-      context.font = '20px Courier New'
-      context.fillText(Math.floor(turntime / 60), canvas.width / 2 + 4, 35);
-
-
-      //Text stuff!
-      context.fillStyle = 'red'
-      context.font = '12px Courier New'
-      context.fillText(`x: ${Math.floor(pointer.x)}`, pointer.x + 15, pointer.y - 15);
-      context.fillText(`y: ${Math.floor(pointer.y)}`, pointer.x + 15, pointer.y - 5);
 
       //Text stuff!
       context.fillStyle = 'white'
